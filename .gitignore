@@ -1,2 +1,13 @@
 
 portevue
+
+*.log
+*.aux
+*.eps
+*eps-converted-to.pdf
+
+*.tgz
+
+flipflop/*.tex
+flipflop/*.pdf
+#(genere automatiquement par gnuplot)
