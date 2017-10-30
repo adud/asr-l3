@@ -65,16 +65,21 @@ void Processor::von_Neuman_step(bool debug) {
 		manage_flags=true;
 		break;
 
-	case 0xa: // jump
-		read_addr_from_pc(offset);
-		pc += offset;
-		m -> set_counter(PC, (uword)pc);
-		manage_flags=false;		
+
+		
+	case 0x6://let
+		read_reg_from_pc(regnum1);
+		read_reg_from_pc(regnum2);
+		r[regnum1] = r[regnum2];
+		manage_flags=false;
+		break;
+	case 0x7://leti
+		read_reg_from_pc(regnum1);
+		read_const_from_pc(constop);
+		r[regnum1] = constop;
+		manage_flags=false;
 		break;
 
-		// begin sabote
-		// end sabote
-		
 	case 0x8: // shift
 		read_bit_from_pc(dir);
 		read_reg_from_pc(regnum1);
@@ -94,8 +99,47 @@ void Processor::von_Neuman_step(bool debug) {
 		manage_flags=false;		
 		break;
 
-		// begin sabote
-		//end sabote
+	case 0x9:
+		read_bit_from_pc(opcode); //read 1 more bit
+		switch(opcode){
+		case 0b10010://readze
+			read_counter_from_pc(counter);
+			read_size_from_pc(size);
+			read_reg_from_pc(regnum1);
+			
+			for(int i=0;i<sizeval(size);i++){
+				ur = (ur<<1) + m->read_bit(counter);
+				incr_count(counter);
+			}
+			r[regnum1] = ur;
+			break;
+		case 0b10011://readse
+			read_counter_from_pc(counter);
+			read_size_from_pc(size);
+			read_reg_from_pc(regnum1);
+
+			int fbit = m->read_bit(counter);
+			incr_count(counter);
+
+			for(int i=0;i<WORDSIZE-sizeval(size)+1;i++){
+				ur = (ur<<1) + fbit;
+			}
+			for(int i=0;i<sizeval(size)-1;i++){
+				ur = (ur<<1) + m->read_bit(counter);
+				incr_count(counter);
+			}
+			r[regnum1] = ur;
+			break;
+		}
+
+		break;
+	case 0xa: // jump
+		read_addr_from_pc(offset);
+		pc += offset;
+		m -> set_counter(PC, (uword)pc);
+		manage_flags=false;		
+		break;
+
 
 	case 0xc:
 	case 0xd:
@@ -255,7 +299,12 @@ bool Processor::cond_true(int cond) {
 		return (! zflag);
 		break;
 		// begin sabote
-		// end sabote
+	case 2 :
+		return !zflag && !nflag;
+	case 3 :
+		return nflag;
+// end sabote
+		
 	}
 	throw "Unexpected condition code";
 }
@@ -274,9 +323,30 @@ void Processor::read_size_from_pc(int& size) {
 	// begin sabote
 	size=0;
 	read_bit_from_pc(size);
-	if(size){
+	read_bit_from_pc(size);
+	if(size>>1)
 		read_bit_from_pc(size);
-		read_bit_from_pc(size);
-	}
 	// end sabote
+}
+
+
+void Processor::incr_count(int counter){
+	switch(counter){
+	case 0:pc++;break;
+	case 1:sp++;break;
+	case 2:a1++;break;
+	case 3:a2++;break;
+	}
+}
+
+
+int sizeval(int size){
+	switch(size){
+	case 0b00:return 1;
+	case 0b01:return 4;
+	case 0b100:return 8;
+	case 0b101:return 16;
+	case 0b110:return 32;
+	case 0b111:return 64;
+	}
 }

@@ -18,6 +18,8 @@ class Processor {
 	void read_cond_from_pc(int& var);
 	bool cond_true(int cond);
 
+	void incr_count(int counter);//incremente le counter en argument
+	
 	Memory *m;
 	uword pc;
 	uword sp;
@@ -32,3 +34,7 @@ class Processor {
 	bool cflag;
 	bool nflag;
 };
+
+int sizeval(int size);//la table 2 size
+
+
