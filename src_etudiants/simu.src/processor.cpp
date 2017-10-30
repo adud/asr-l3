@@ -112,7 +112,9 @@ void Processor::von_Neuman_step(bool debug) {
 				incr_count(counter);
 			}
 			r[regnum1] = ur;
+			manage_flags = false;
 			break;
+			
 		case 0b10011://readse
 			read_counter_from_pc(counter);
 			read_size_from_pc(size);
@@ -129,9 +131,10 @@ void Processor::von_Neuman_step(bool debug) {
 				incr_count(counter);
 			}
 			r[regnum1] = ur;
+			manage_flags = false;
 			break;
 		}
-
+		
 		break;
 	case 0xa: // jump
 		read_addr_from_pc(offset);
@@ -139,9 +142,39 @@ void Processor::von_Neuman_step(bool debug) {
 		m -> set_counter(PC, (uword)pc);
 		manage_flags=false;		
 		break;
-
-
+		
+	case 0xb: //jumpif
+		read_cond_from_pc(condcode);
+		read_addr_from_pc(offset);
+		if(cond_true(condcode)){
+			pc += offset;
+			m->set_counter(PC, (uword)pc);
+		}
+		manage_flags=false;
+		break;
+		
 	case 0xc:
+		//read two more bits
+		read_bit_from_pc(opcode);
+		read_bit_from_pc(opcode);
+		switch(opcode){
+		case 0b110000://or2
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			uop1 = r[regnum1];
+			uop2 = r[regnum2];
+			ur = uop1|uop2;
+			r[regnum1] = ur;
+			manage_flags=false;
+			break;
+
+/*		case 0b110001://or2i
+			read_reg_from_pc(regnum1);
+			read_const_from_pc(constop);
+*/
+			
+		}
+		break;
 	case 0xd:
 		//read two more bits
 		read_bit_from_pc(opcode);
