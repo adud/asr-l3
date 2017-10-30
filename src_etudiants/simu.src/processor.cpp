@@ -230,6 +230,11 @@ void Processor::read_addr_from_pc(uword& var) {
 
 void Processor::read_shiftval_from_pc(int& var) {
 	// begin sabote
+	var=0;
+	read_bit_from_pc(var);
+	if(!var){
+		for(int i=0;i<6;read_bit_from_pc(var),i++){}
+	}	
 	//end sabote
 }
 
@@ -258,11 +263,20 @@ bool Processor::cond_true(int cond) {
 
 void Processor::read_counter_from_pc(int& var) {
 	// begin sabote
+	var=0;
+	read_bit_from_pc(var);
+	read_bit_from_pc(var);
 	// end sabote
 }
 
 
 void Processor::read_size_from_pc(int& size) {
 	// begin sabote
+	size=0;
+	read_bit_from_pc(size);
+	if(size){
+		read_bit_from_pc(size);
+		read_bit_from_pc(size);
+	}
 	// end sabote
 }

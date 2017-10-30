@@ -1,4 +1,3 @@
-
 portevue
 
 *.log
@@ -11,3 +10,7 @@ portevue
 flipflop/*.tex
 flipflop/*.pdf
 #(genere automatiquement par gnuplot)
+
+#src : fichiers de compilation
+src_etudiants/simu
+*.o
