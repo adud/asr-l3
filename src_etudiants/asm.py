@@ -27,7 +27,10 @@ def asm_reg(s):
     "converts the string s into its encoding"
     if s[0]!='r':
         error("invalid register: " + s)
-    val = int(s[1:]) # this removes the "r". TODO catch exception here
+    try:
+        val = int(s[1:])
+    except ValueError:
+        error("invalid register: " + s)
     if val<0 or val>7:
         error("invalid register: " + s)
     else:
@@ -60,7 +63,10 @@ def asm_const_unsigned(s):
     "converts the string s into its encoding"
     # Is it a label or a constant? 
     if (s[0]>='0' and s[0]<='9') or s[0:2]=="0x":
-        val=int(s,0) # TODO  catch exception here
+        try:
+            val=int(s,0)
+        except ValueError:
+            error("Expecting a constant, got " + s)
         # The follwing is not very elegant but easy to trust
         if val==0 or val==1:
             return '0 ' + str(val)
@@ -76,13 +82,39 @@ def asm_const_unsigned(s):
         
 def asm_const_signed(s):
     "converts the string s into its encoding"
-    # begin sabote
-    # end sabote
+    if (s[0]>='0' and s[0]<='9') or s[0] == "-" or s[0:2]=="0x" or \
+       s[0:2]=="-0x":
+        try:
+            val=int(s,0)
+        except ValueError:
+            error("Expecting a constant, got " + s)
+        if val==0 or val==1:
+            return '0 ' + str(val)
+        elif -128 <= val < 128:
+            return '10 ' + binary_repr(val, 8)
+        elif  (-1 << 31) <= val < (1 << 31):
+            return '110 ' + binary_repr(val, 32)
+        else:
+            return '111 ' +  binary_repr(val, 64)
+    else:
+        error("Expecting a constant, got " + s)
     
 def asm_shiftval(s):
     "converts the string s into its encoding"
-    # begin sabote
-    # end sabote
+    if (s[0]>='0' and s[0]<='9') or s[0:2]=="0x":
+        try:
+            val=int(s,0)
+        except ValueError:
+            error("Expecting a constant, got " + s)
+
+        if val == 1:
+            return "1"
+        elif val < 64:
+            return "0 " + binary_repr(val, 6)
+        else:
+            error("Expecting a constant between 0 and 63, got " + s)
+    else:
+        error("Expecting a constant between 0 and 63, got " + s)
            
 
 def asm_condition(cond):
