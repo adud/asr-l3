@@ -14,3 +14,6 @@ flipflop/*.pdf
 #src : fichiers de compilation
 src_etudiants/simu
 *.o
+/src_etudiants/ASM/testtt.obj
+
+*~

@@ -56,7 +56,7 @@ void Processor::von_Neuman_step(bool debug) {
 
 	case 0x1: // add2i
 		read_reg_from_pc(regnum1);
-		read_const_from_pc(constop);
+		read_const_from_pc(constop,false);
 		uop1 = r[regnum1];
 		uop2 = constop; 
 		fullr = ((doubleword) uop1) + ((doubleword) uop2); // for flags
@@ -75,7 +75,7 @@ void Processor::von_Neuman_step(bool debug) {
 		break;
 	case 0x7://leti
 		read_reg_from_pc(regnum1);
-		read_const_from_pc(constop);
+		read_const_from_pc(constop,true);
 		r[regnum1] = constop;
 		manage_flags=false;
 		break;
@@ -168,10 +168,35 @@ void Processor::von_Neuman_step(bool debug) {
 			manage_flags=false;
 			break;
 
-/*		case 0b110001://or2i
+		case 0b110001://or2i
 			read_reg_from_pc(regnum1);
-			read_const_from_pc(constop);
-*/
+			read_const_from_pc(constop,true);
+			uop1 = r[regnum1];
+			uop2 = constop;
+			ur = uop1|uop2;
+			r[regnum1] = ur;
+			manage_flags=false;
+			break;
+			
+		case 0b110010://and2
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			uop1 = r[regnum1];
+			uop2 = r[regnum2];
+			ur = uop1&uop2;
+			r[regnum1] = ur;
+			manage_flags=false;
+			break;
+
+		case 0b110011://and2i
+			read_reg_from_pc(regnum1);
+			read_const_from_pc(constop,true);
+			uop1 = r[regnum1];
+			uop2 = constop;
+			ur = uop1&uop2;
+			r[regnum1] = ur;
+			manage_flags=false;
+			break;
 			
 		}
 		break;
@@ -183,7 +208,40 @@ void Processor::von_Neuman_step(bool debug) {
 			
 		case 0b110100: // write
 			// begin sabote
+			read_counter_from_pc(counter);
+			read_size_from_pc(size);
+			read_reg_from_pc(regnum1);
+			uop1 = r[regnum1];
+			for(int i=size-1;i>=0;i--)
+			{
+				m->write_bit(counter,1 & (uop1>>i));
+				incr_count(counter);
+			}
 			//end sabote
+			manage_flags = false;
+			break;
+			
+		case 0b110101: //call
+			read_addr_from_pc(offset);
+			r[7] = pc;
+			m->set_counter(PC,offset);
+			pc = offset;
+			manage_flags = false;
+			break;
+		case 0b110110: //setctr
+			read_counter_from_pc(counter);
+			read_reg_from_pc(regnum1);
+			uop1 = r[regnum1];
+			m->set_counter(counter,uop1);
+			set_count(counter,uop1);
+			manage_flags = false;
+			break;
+			
+		case 0b110111: //getctr
+			read_counter_from_pc(counter);
+			read_reg_from_pc(regnum1);
+			r[regnum1] = m->counter[counter];
+			manage_flags = false;
 			break;
 		}
 		break; // Do not forget this break! 
@@ -240,7 +298,7 @@ void Processor::read_reg_from_pc(int& var) {
 
 
 //unsigned
-void Processor::read_const_from_pc(uint64_t& var) {
+void Processor::read_const_from_pc(uint64_t& var,bool sex) {
 	var=0;
 	int header=0;
 	int size;
@@ -264,6 +322,12 @@ void Processor::read_const_from_pc(uint64_t& var) {
 		var = (var<<1) + m->read_bit(PC);
 		pc++;
 	}		
+
+	if(sex){
+	  int sign=(var >> (size-1)) & 1;
+	  for (int i=size; i<WORDSIZE; i++)
+	    var += sign << i;
+	}
 }
 
 
@@ -360,10 +424,7 @@ void Processor::read_size_from_pc(int& size) {
 	read_bit_from_pc(ss);
 	if(ss>>1)
 		read_bit_from_pc(ss);
-	for(int i=0;i<sizeval(ss);i++)
-	{
-		read_bit_from_pc(size);
-	}
+	size = sizeval(ss);
 	// end sabote
 }
 
@@ -375,9 +436,17 @@ void Processor::incr_count(int counter){
 	case 2:a1++;break;
 	case 3:a2++;break;
 	}
+	
 }
 
-
+void Processor::set_count(int counter,uword offset){
+	switch(counter){
+	case 0:pc=offset;break;
+	case 1:sp=offset;break;
+	case 2:a1=offset;break;
+	case 3:a2=offset;break;
+	}
+}
 int sizeval(int size){
 	switch(size){
 	case 0b00:return 1;
