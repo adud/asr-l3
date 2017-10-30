@@ -107,7 +107,7 @@ void Processor::von_Neuman_step(bool debug) {
 			read_size_from_pc(size);
 			read_reg_from_pc(regnum1);
 			
-			for(int i=0;i<sizeval(size);i++){
+			for(int i=0;i<size;i++){
 				ur = (ur<<1) + m->read_bit(counter);
 				incr_count(counter);
 			}
@@ -354,11 +354,16 @@ void Processor::read_counter_from_pc(int& var) {
 
 void Processor::read_size_from_pc(int& size) {
 	// begin sabote
+	int ss=0;//la taille de size
 	size=0;
-	read_bit_from_pc(size);
-	read_bit_from_pc(size);
-	if(size>>1)
+	read_bit_from_pc(ss);
+	read_bit_from_pc(ss);
+	if(ss>>1)
+		read_bit_from_pc(ss);
+	for(int i=0;i<sizeval(ss);i++)
+	{
 		read_bit_from_pc(size);
+	}
 	// end sabote
 }
 
