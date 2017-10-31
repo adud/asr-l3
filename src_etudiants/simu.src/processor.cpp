@@ -32,7 +32,7 @@ void Processor::von_Neuman_step(bool debug) {
 	uword uop1;
 	uword uop2;
 	uword ur=0;
-	doubleword fullr;
+	doubleword fullr=0;
 	bool manage_flags=false; // used to factor out the flag management code
 	int instr_pc = pc; // for the debug output
 	
@@ -166,7 +166,7 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = r[regnum2];
 			ur = uop1|uop2;
 			r[regnum1] = ur;
-			manage_flags=false;
+			manage_flags=true;
 			break;
 
 		case 0b110001://or2i
@@ -176,7 +176,7 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = constop;
 			ur = uop1|uop2;
 			r[regnum1] = ur;
-			manage_flags=false;
+			manage_flags=true;
 			break;
 			
 		case 0b110010://and2
@@ -186,7 +186,7 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = r[regnum2];
 			ur = uop1&uop2;
 			r[regnum1] = ur;
-			manage_flags=false;
+			manage_flags=true;
 			break;
 
 		case 0b110011://and2i
@@ -196,7 +196,7 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = constop;
 			ur = uop1&uop2;
 			r[regnum1] = ur;
-			manage_flags=false;
+			manage_flags=true;
 			break;
 			
 		}
@@ -299,7 +299,7 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = r[regnum3];
 			ur = uop1&uop2;
 			r[regnum1] = ur;
-			manage_flags=false;
+			manage_flags=true;
 			break;
 
 		case 0b1110111://and3i
@@ -310,7 +310,7 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = constop;
 			ur = uop1&uop2;
 			r[regnum1] = ur;
-			manage_flags=false;
+			manage_flags=true;
 			break;
 			
 			
@@ -330,7 +330,7 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = r[regnum3];
 			ur = uop1|uop2;
 			r[regnum1] = ur;
-			manage_flags=false;
+			manage_flags=true;
 			break;
 
 		case 0b1111001://or3i
@@ -341,7 +341,7 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = constop;
 			ur = uop1|uop2;
 			r[regnum1] = ur;
-			manage_flags=false;
+			manage_flags=true;
 			break;
 			
 		case 0b1111010://xor3
@@ -352,7 +352,7 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = r[regnum3];
 			ur = uop1^uop2;
 			r[regnum1] = ur;
-			manage_flags=false;
+			manage_flags=true;
 			break;
 
 		case 0b1111011://xor3i
@@ -363,7 +363,7 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = constop;
 			ur = uop1^uop2;
 			r[regnum1] = ur;
-			manage_flags=false;
+			manage_flags=true;
 			break;
 		// begin sabote
 		// end sabote
