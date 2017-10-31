@@ -218,7 +218,7 @@ def asm_pass(iteration, s_file):
             if opcode == "jump" and token_count==2:
                 instruction_encoding = "1010 " + asm_addr_signed(tokens[1])
             #begin sabote
-            if opcode == "jump" and token_count==2:
+            if opcode == "jumpif" and token_count==2:
                 instruction_encoding = "1011 " + asm_condition(tokens[1]) + asm_addr_signed(tokens[2])
             if opcode == "or2" and token_count==3:
                 instruction_encoding = "110000 " + asm_reg(tokens[1]) + asm_reg(tokens[2])
