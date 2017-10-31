@@ -365,11 +365,27 @@ void Processor::von_Neuman_step(bool debug) {
 			r[regnum1] = ur;
 			manage_flags=true;
 			break;
-		// begin sabote
-		// end sabote
+
+		case 0b1111100://asr3
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_shiftval_from_pc(shiftval);
+			uop1=r[regnum2];
+			
+			ur = (uword)(((sword)uop1) >> shiftval);
+			r[regnum1] = ur;
+						
+			cflag = ( ((uop1 >> (shiftval-1))&1) == 1);
+			zflag = (ur==0);
+			nflag = (0 > (sword) ur);
+			manage_flags=false;
+			break;
+		}
+
 		break;
+
+		
 	}
-	
 	// flag management
 	if(manage_flags) {
 		zflag = (ur==0);
