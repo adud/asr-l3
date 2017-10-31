@@ -26,9 +26,10 @@ class Processor {
 	//lit 3 bits correspondant a une condition
 	bool cond_true(int cond);
 	//interroge les flags pour savoir si une condition est vraie
-	void incr_count(int counter);//incremente le counter en argument
+	void incr_count(int counter);
+	//incremente le counter *du proc* en argument
 	void set_count(int counter,uword offset);
-	
+	//met a offset le counter *du proc* en argument
 	Memory *m;
 	uword pc;
 	uword sp;

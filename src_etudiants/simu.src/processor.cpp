@@ -262,6 +262,11 @@ void Processor::von_Neuman_step(bool debug) {
 			m->set_counter(SP,sp);
 			manage_flags = false;
 			break;
+		case 0b1110001://return
+			m->set_counter(PC,r[7]);
+			set_count(PC,r[7]);
+			manage_flags = false;
+			break;
 			
 		}
 		break;
