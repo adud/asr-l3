@@ -19,6 +19,7 @@ void Processor::von_Neuman_step(bool debug) {
 	int opcode=0;
 	int regnum1=0;
 	int regnum2=0;
+	int regnum3=0;
 	int shiftval=0;
 	int condcode=0;
 	int counter=0;
@@ -267,6 +268,51 @@ void Processor::von_Neuman_step(bool debug) {
 			set_count(PC,r[7]);
 			manage_flags = false;
 			break;
+		case 0b1110010://add3
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_reg_from_pc(regnum3);
+			uop1 = r[regnum2];
+			uop2 = r[regnum3];
+			fullr = ((doubleword) uop1) + ((doubleword) uop2); // for flags
+			ur = uop1 + uop2;
+			r[regnum1] = ur;
+			manage_flags=true;
+			break;
+		case 0b1110011://add3i
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_const_from_pc(constop,false);
+			uop1 = r[regnum2];
+			uop2 = constop; 
+			fullr = ((doubleword) uop1) + ((doubleword) uop2); // for flags
+			ur = uop1 + uop2;
+			r[regnum1] = ur;
+			manage_flags=true;
+			break;
+			
+		case 0b1110110://and3
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_reg_from_pc(regnum3);
+			uop1 = r[regnum2];
+			uop2 = r[regnum3];
+			ur = uop1&uop2;
+			r[regnum1] = ur;
+			manage_flags=false;
+			break;
+
+		case 0b1110111://and3i
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_const_from_pc(constop,true);
+			uop1 = r[regnum2];
+			uop2 = constop;
+			ur = uop1&uop2;
+			r[regnum1] = ur;
+			manage_flags=false;
+			break;
+			
 			
 		}
 		break;
@@ -275,7 +321,50 @@ void Processor::von_Neuman_step(bool debug) {
 		read_bit_from_pc(opcode);
 		read_bit_from_pc(opcode);
 		read_bit_from_pc(opcode);
-		
+		switch(opcode){
+		case 0b1111000://or3
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_reg_from_pc(regnum3);
+			uop1 = r[regnum2];
+			uop2 = r[regnum3];
+			ur = uop1|uop2;
+			r[regnum1] = ur;
+			manage_flags=false;
+			break;
+
+		case 0b1111001://or3i
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_const_from_pc(constop,true);
+			uop1 = r[regnum2];
+			uop2 = constop;
+			ur = uop1|uop2;
+			r[regnum1] = ur;
+			manage_flags=false;
+			break;
+			
+		case 0b1111010://xor3
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_reg_from_pc(regnum3);
+			uop1 = r[regnum2];
+			uop2 = r[regnum3];
+			ur = uop1^uop2;
+			r[regnum1] = ur;
+			manage_flags=false;
+			break;
+
+		case 0b1111011://xor3i
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_const_from_pc(constop,true);
+			uop1 = r[regnum2];
+			uop2 = constop;
+			ur = uop1^uop2;
+			r[regnum1] = ur;
+			manage_flags=false;
+			break;
 		// begin sabote
 		// end sabote
 		break;
