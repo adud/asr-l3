@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 
 # This program assembles source assembly code into a bit string.
 # The bit string includes spaces and newlines for readability,
@@ -48,7 +48,8 @@ def asm_addr_signed(s):
             return '0 ' + binary_repr(val, 8)
         elif val>=-32768 and val<= 32767:
             return '10 ' +  binary_repr(val, 16)
-        elif val>=-(1<<31) and val<= (1<<31)-1:
+        elif val>=-(1<<31) and val
+        <= (1<<31)-1:
             return '110 ' + binary_repr(val, 32)
         else:
             return '111 ' +  binary_repr(val, 64)
@@ -148,6 +149,14 @@ def asm_size(s):
         error("Invalid size: " + size)
 
 
+def asm_dir(dir):
+    """converts the string s into its encoding. """
+    codelist = {"left":"0", "right":"1", "0":"0", "1":"1"}
+    if dir in codelist:
+        return codelist[dir] + " "
+    else:
+        error("Invalid direction: " + dir)
+
 def asm_pass(iteration, s_file):
     global line
     global labels
@@ -185,6 +194,28 @@ def asm_pass(iteration, s_file):
                     instruction_encoding = "0000 " + asm_reg(tokens[1]) + asm_reg(tokens[2])
             if opcode == "add2i" and token_count==3:
                     instruction_encoding = "0001 " + asm_reg(tokens[1]) + asm_const_unsigned(tokens[2])
+            if opcode == "sub2" and token_count==3:
+                    instruction_encoding = "0010 " + asm_reg(tokens[1]) + asm_reg(tokens[2])
+            if opcode == "sub2i" and token_count==3:
+                    instruction_encoding = "0011 " + asm_reg(tokens[1]) + asm_const_unsigned(tokens[2])
+            if opcode == "cmp" and token_count==3:
+                    instruction_encoding = "0100 " + asm_reg(tokens[1]) + asm_reg(tokens[2])
+            if opcode == "cmpi" and token_count==3:
+                    instruction_encoding = "0101 " + asm_reg(tokens[1]) + asm_const_unsigned(tokens[2])
+            if opcode == "let" and token_count==3:
+                    instruction_encoding = "0110 " + asm_reg(tokens[1]) + asm_reg(tokens[2])
+            if opcode == "leti" and token_count==3:
+                    instruction_encoding = "0111 " + asm_reg(tokens[1]) + asm_const_unsigned(tokens[2])
+
+            # Des trucs à insérer entre
+            if opcode == "or2" and token_count==3:
+                    instruction_encoding = "110000 " + asm_reg(tokens[1]) + asm_reg(tokens[2])
+            if opcode == "or2i" and token_count==3:
+                    instruction_encoding = "110001 " + asm_reg(tokens[1]) + asm_const_unsigned(tokens[2])
+            if opcode == "and2" and token_count==3:
+                    instruction_encoding = "110010 " + asm_reg(tokens[1]) + asm_reg(tokens[2])
+            if opcode == "and2i" and token_count==3:
+                    instruction_encoding = "110011 " + asm_reg(tokens[1]) + asm_const_unsigned(tokens[2])
             # Here, a lot of constructive copypaste, for instance
             if opcode == "jump" and token_count==2:
                     instruction_encoding = "1010 " + asm_addr_signed(tokens[1])
