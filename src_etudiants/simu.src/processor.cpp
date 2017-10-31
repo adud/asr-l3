@@ -119,16 +119,16 @@ void Processor::von_Neuman_step(bool debug) {
 			read_counter_from_pc(counter);
 			read_size_from_pc(size);
 			read_reg_from_pc(regnum1);
-
-			int fbit = m->read_bit(counter);
-			incr_count(counter);
-
-			for(int i=0;i<WORDSIZE-sizeval(size)+1;i++){
-				ur = (ur<<1) + fbit;
-			}
-			for(int i=0;i<sizeval(size)-1;i++){
+			
+			for(int i=0;i<size;i++){
 				ur = (ur<<1) + m->read_bit(counter);
 				incr_count(counter);
+			}
+			
+			int fbit = (ur >> (size-1));
+			for(int i=size;i<WORDSIZE;i++)
+			{
+				ur += (fbit << i); 
 			}
 			r[regnum1] = ur;
 			manage_flags = false;
@@ -456,4 +456,5 @@ int sizeval(int size){
 	case 0b110:return 32;
 	case 0b111:return 64;
 	}
+	return 0;
 }
