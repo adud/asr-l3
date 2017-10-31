@@ -19,6 +19,7 @@ void Processor::von_Neuman_step(bool debug) {
 	int opcode=0;
 	int regnum1=0;
 	int regnum2=0;
+	int regnum3=0;
 	int shiftval=0;
 	int condcode=0;
 	int counter=0;
@@ -31,10 +32,9 @@ void Processor::von_Neuman_step(bool debug) {
 	uword uop1;
 	uword uop2;
 	uword ur=0;
-	doubleword fullr;
+	doubleword fullr=0;
 	bool manage_flags=false; // used to factor out the flag management code
 	int instr_pc = pc; // for the debug output
-	
 	// read 4 bits.
 	read_bit_from_pc(opcode);
 	read_bit_from_pc(opcode);
@@ -51,6 +51,7 @@ void Processor::von_Neuman_step(bool debug) {
 		fullr = ((doubleword) uop1) + ((doubleword) uop2); // for flags
 		ur = uop1 + uop2;
 		r[regnum1] = ur;
+		vflag = sum_overflow(uop1,uop2,ur);
 		manage_flags=true;
 		break;
 
@@ -62,11 +63,52 @@ void Processor::von_Neuman_step(bool debug) {
 		fullr = ((doubleword) uop1) + ((doubleword) uop2); // for flags
 		ur = uop1 + uop2;
 		r[regnum1] = ur;
+		vflag = sum_overflow(uop1,uop2,ur);
 		manage_flags=true;
 		break;
 
-
-		
+	case 0x2://sub2
+		read_reg_from_pc(regnum1);
+		read_reg_from_pc(regnum2);
+		uop1=r[regnum1];
+		uop2=r[regnum2];
+		fullr = ((doubleword) uop1) - ((doubleword) uop2);
+		ur = uop1 - uop2;
+		r[regnum1] = ur;
+		vflag = diff_overflow(uop1,uop2,ur);
+		manage_flags=true;
+		break;
+	case 0x3://sub2i
+		read_reg_from_pc(regnum1);
+		read_const_from_pc(constop,false);
+		uop1=r[regnum1];
+		uop2=constop;
+		fullr = ((doubleword) uop1) - ((doubleword) uop2);
+		ur = uop1 - uop2;
+		r[regnum1] = ur;
+		vflag = diff_overflow(uop1,uop2,ur);
+		manage_flags=true;
+		break;
+	case 0x4://cmp
+		read_reg_from_pc(regnum1);
+		read_reg_from_pc(regnum2);
+		uop1=r[regnum1];
+		uop2=r[regnum2];
+		fullr = ((doubleword) uop1) - ((doubleword) uop2);
+		ur = uop1 - uop2;
+		vflag = diff_overflow(uop1,uop2,ur);
+		manage_flags=true;
+		break;
+	case 0x5://cmpi
+		read_reg_from_pc(regnum1);
+		read_const_from_pc(constop,false);
+		uop1=r[regnum1];
+		uop2=constop;
+		fullr = ((doubleword) uop1) - ((doubleword) uop2);
+		ur = uop1 - uop2;
+		vflag = diff_overflow(uop1,uop2,ur);
+		manage_flags=true;
+		break;
 	case 0x6://let
 		read_reg_from_pc(regnum1);
 		read_reg_from_pc(regnum2);
@@ -95,7 +137,8 @@ void Processor::von_Neuman_step(bool debug) {
 		}
 		r[regnum1] = ur;
 		zflag = (ur==0);
-		// no change to nflag
+		// no change to nflag ????
+		vflag = false;
 		manage_flags=false;		
 		break;
 
@@ -119,16 +162,16 @@ void Processor::von_Neuman_step(bool debug) {
 			read_counter_from_pc(counter);
 			read_size_from_pc(size);
 			read_reg_from_pc(regnum1);
-
-			int fbit = m->read_bit(counter);
-			incr_count(counter);
-
-			for(int i=0;i<WORDSIZE-sizeval(size)+1;i++){
-				ur = (ur<<1) + fbit;
-			}
-			for(int i=0;i<sizeval(size)-1;i++){
+			
+			for(int i=0;i<size;i++){
 				ur = (ur<<1) + m->read_bit(counter);
 				incr_count(counter);
+			}
+			
+			int fbit = (ur >> (size-1));
+			for(int i=size;i<WORDSIZE;i++)
+			{
+				ur += (fbit << i); 
 			}
 			r[regnum1] = ur;
 			manage_flags = false;
@@ -165,7 +208,8 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = r[regnum2];
 			ur = uop1|uop2;
 			r[regnum1] = ur;
-			manage_flags=false;
+			vflag = false;
+			manage_flags=true;
 			break;
 
 		case 0b110001://or2i
@@ -175,7 +219,8 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = constop;
 			ur = uop1|uop2;
 			r[regnum1] = ur;
-			manage_flags=false;
+			vflag = false;
+			manage_flags=true;
 			break;
 			
 		case 0b110010://and2
@@ -185,7 +230,8 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = r[regnum2];
 			ur = uop1&uop2;
 			r[regnum1] = ur;
-			manage_flags=false;
+			vflag = false;
+			manage_flags=true;
 			break;
 
 		case 0b110011://and2i
@@ -195,7 +241,8 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = constop;
 			ur = uop1&uop2;
 			r[regnum1] = ur;
-			manage_flags=false;
+			vflag = false;
+			manage_flags=true;
 			break;
 			
 		}
@@ -247,17 +294,177 @@ void Processor::von_Neuman_step(bool debug) {
 		break; // Do not forget this break! 
 		
 	case 0xe:
+		//read 3 more bits
+		read_bit_from_pc(opcode);
+		read_bit_from_pc(opcode);
+		read_bit_from_pc(opcode);
+		switch(opcode){
+		case 0b1110000://push (sans size !!!)
+			read_reg_from_pc(regnum1);
+			uop1 = r[regnum1];
+   			sp -= WORDSIZE;
+			m->set_counter(SP,sp);
+			for(int i=WORDSIZE-1;i>=0;i--)
+				m->write_bit(SP,(uop1>>i)&1);
+			m->set_counter(SP,sp);
+			manage_flags = false;
+			break;
+		case 0b1110001://return
+			m->set_counter(PC,r[7]);
+			set_count(PC,r[7]);
+			manage_flags = false;
+			break;
+		case 0b1110010://add3
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_reg_from_pc(regnum3);
+			uop1 = r[regnum2];
+			uop2 = r[regnum3];
+			fullr = ((doubleword) uop1) + ((doubleword) uop2); // for flags
+			ur = uop1 + uop2;
+			r[regnum1] = ur;
+			vflag = sum_overflow(uop1,uop2,ur);
+			manage_flags=true;
+			break;
+		case 0b1110011://add3i
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_const_from_pc(constop,false);
+			uop1 = r[regnum2];
+			uop2 = constop; 
+			fullr = ((doubleword) uop1) + ((doubleword) uop2); // for flags
+			ur = uop1 + uop2;
+			r[regnum1] = ur;
+			vflag = sum_overflow(uop1,uop2,ur);
+			manage_flags=true;
+			break;
+		case 0x1110100://sub3
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_reg_from_pc(regnum3);
+			uop1=r[regnum2];
+			uop2=r[regnum3];
+			fullr = ((doubleword) uop1) - ((doubleword) uop2);
+			ur = uop1 - uop2;
+			r[regnum1] = ur;
+			vflag = diff_overflow(uop1,uop2,ur);
+			manage_flags=true;
+			break;
+		case 0x1110101://sub3i
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_const_from_pc(constop,false);
+			uop1=r[regnum2];
+			uop2=constop;
+			fullr = ((doubleword) uop1) - ((doubleword) uop2);
+			ur = uop1 - uop2;
+			r[regnum1] = ur;
+			vflag = diff_overflow(uop1,uop2,ur);
+			manage_flags=true;
+			break;
+			
+		case 0b1110110://and3
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_reg_from_pc(regnum3);
+			uop1 = r[regnum2];
+			uop2 = r[regnum3];
+			ur = uop1&uop2;
+			r[regnum1] = ur;
+			vflag = false;
+			manage_flags=true;
+			break;
+
+		case 0b1110111://and3i
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_const_from_pc(constop,true);
+			uop1 = r[regnum2];
+			uop2 = constop;
+			ur = uop1&uop2;
+			r[regnum1] = ur;
+			vflag = false;
+			manage_flags=true;
+			break;
+			
+			
+		}
+		break;
 	case 0xf:
 		//read 3 more bits
 		read_bit_from_pc(opcode);
 		read_bit_from_pc(opcode);
 		read_bit_from_pc(opcode);
-		
-		// begin sabote
-		// end sabote
+		switch(opcode){
+		case 0b1111000://or3
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_reg_from_pc(regnum3);
+			uop1 = r[regnum2];
+			uop2 = r[regnum3];
+			ur = uop1|uop2;
+			r[regnum1] = ur;
+			vflag = false;
+			manage_flags=true;
+			break;
+
+		case 0b1111001://or3i
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_const_from_pc(constop,true);
+			uop1 = r[regnum2];
+			uop2 = constop;
+			ur = uop1|uop2;
+			r[regnum1] = ur;
+			vflag = false;
+			manage_flags=true;
+			break;
+			
+		case 0b1111010://xor3
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_reg_from_pc(regnum3);
+			uop1 = r[regnum2];
+			uop2 = r[regnum3];
+			ur = uop1^uop2;
+			r[regnum1] = ur;
+			vflag = false;
+			manage_flags=true;
+			break;
+
+		case 0b1111011://xor3i
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_const_from_pc(constop,true);
+			uop1 = r[regnum2];
+			uop2 = constop;
+			ur = uop1^uop2;
+			r[regnum1] = ur;
+			vflag = false;
+			manage_flags=true;
+			break;
+
+		case 0b1111100://asr3
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_shiftval_from_pc(shiftval);
+			uop1=r[regnum2];
+			
+			ur = (uword)(((sword)uop1) >> shiftval);
+			r[regnum1] = ur;
+						
+			cflag = ( ((uop1 >> (shiftval-1))&1) == 1);
+			zflag = (ur==0);
+			nflag = (0 > (sword) ur);
+			vflag = false;
+			manage_flags=false;
+			break;
+		}
+
 		break;
+
+		
 	}
-	
 	// flag management
 	if(manage_flags) {
 		zflag = (ur==0);
@@ -274,7 +481,7 @@ void Processor::von_Neuman_step(bool debug) {
 				 << " ma0=" << hex << setw(8) << setfill('0') << m->counter[2] 
 				 << " ma1=" << hex << setw(8) << setfill('0') << m->counter[3] << ") ";
 			//				 << " newpc=" << hex << setw(9) << setfill('0') << pc;
-		cout << " zcn = " << (zflag?1:0) << (cflag?1:0) << (nflag?1:0);
+		cout << " zcnv = " << (zflag?1:0) << (cflag?1:0) << (nflag?1:0) << (vflag?1:0);
 		for (int i=0; i<8; i++)
 			cout << " r"<< dec << i << "=" << hex << setw(8) << setfill('0') << r[i];
 		cout << endl;
@@ -397,9 +604,18 @@ bool Processor::cond_true(int cond) {
 		break;
 		// begin sabote
 	case 2 :
-		return !zflag && !nflag;
+		return (nflag == vflag)&&(!zflag);
 	case 3 :
-		return nflag;
+		return nflag!=vflag;
+	case 4 :
+		return !(zflag||cflag);
+	case 5 :
+		return !cflag;
+	case 6 :
+		return cflag;
+	case 7 :
+		return zflag || cflag;
+		
 // end sabote
 		
 	}
@@ -456,4 +672,15 @@ int sizeval(int size){
 	case 0b110:return 32;
 	case 0b111:return 64;
 	}
+	return 0;
+}
+
+bool sum_overflow(uword uop1, uword uop2, uword ur)
+{
+	return ((uop1>>(WORDSIZE-1))==(uop2>>(WORDSIZE-1)))&&((ur>>(WORDSIZE-1))!=(uop1>>(WORDSIZE-1)));
+}
+
+bool diff_overflow(uword uop1, uword uop2, uword ur)
+{
+	return sum_overflow(ur,uop2,uop1);
 }
