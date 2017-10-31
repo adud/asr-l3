@@ -9,7 +9,9 @@ class Processor {
  private:
 	void read_bit_from_pc(int& var);
 	void read_reg_from_pc(int& var);
-	void read_const_from_pc(uint64_t& var);
+	void read_const_from_pc(uint64_t& var,bool sex);
+	//si s(ign)ex(tension) est vrai, la constante est lue
+	//avec extension de signe
 	void read_addr_from_pc(uword& var);
 	void read_shiftval_from_pc(int& var);
 	void read_counter_from_pc(int& var);
@@ -18,6 +20,9 @@ class Processor {
 	void read_cond_from_pc(int& var);
 	bool cond_true(int cond);
 
+	void incr_count(int counter);//incremente le counter en argument
+	void set_count(int counter,uword offset);
+	
 	Memory *m;
 	uword pc;
 	uword sp;
@@ -32,3 +37,7 @@ class Processor {
 	bool cflag;
 	bool nflag;
 };
+
+int sizeval(int size);//la table 2 size
+
+
