@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 
 # This program assembles source assembly code into a bit string.
 # The bit string includes spaces and newlines for readability,
@@ -38,10 +38,11 @@ def asm_reg(s):
 
 
 
-def asm_addr_signed(s):
+def asm_addr_signed(s, iteration):
     "converts the string s into its encoding"
     # Is it a label or a constant? 
-    if (s[0]>='0' and s[0]<='9') or s[0]=='-' or s[0]=='+': # TODO what it takes to catch hexa here
+    if (s[0]>='0' and s[0]<='9') or s[0]=='-' or s[0]=='+' or s[0:2] == "0x" \
+       or s[0:3] == "-0x":
         val=int(s) # TODO  catch exception here
         # The following is not very elegant but easy to trust
         if val>=-128 and val<= 127:
@@ -52,6 +53,14 @@ def asm_addr_signed(s):
             return '110 ' + binary_repr(val, 32)
         else:
             return '111 ' +  binary_repr(val, 64)
+    elif iteration == 1:
+        # À la première itération, les liens vers les labels ne sont pas faits.
+        # Nous allons remplacer toutes les adresses par des mots de 64 bits,
+        # ne connaissant pas l'adresse exacte, les bits sont remplacés par des
+        # points d'interrogations.
+        return "111 " + "?" * 64
+    elif iteration == 2:
+        return "111 " + binary_repr(labels[s], 64)
     else:
         error("Fixme! labels currently unsupported")
     
@@ -83,7 +92,7 @@ def asm_const_unsigned(s):
 def asm_const_signed(s):
     "converts the string s into its encoding"
     if (s[0]>='0' and s[0]<='9') or s[0] == "-" or s[0:2]=="0x" or \
-       s[0:2]=="-0x":
+       s[0:3]=="-0x":
         try:
             val=int(s,0)
         except ValueError:
@@ -169,7 +178,7 @@ def asm_pass(iteration, s_file):
         print "processing " + source_line[0:-1] # just to get rid of the final newline
 
         # if there is a comment, get rid of it
-        index = str.find(";", source_line)
+        index = str.find(source_line, ";")
         if index !=-1:
             source_line = source_line[:index]
 
@@ -216,10 +225,11 @@ def asm_pass(iteration, s_file):
                                        asm_reg(tokens[3])
             # Here, a lot of constructive copypaste, for instance
             if opcode == "jump" and token_count==2:
-                instruction_encoding = "1010 " + asm_addr_signed(tokens[1])
+                instruction_encoding = "1010 " + asm_addr_signed(tokens[1], iteration)
             #begin sabote
-            if opcode == "jumpif" and token_count==2:
-                instruction_encoding = "1011 " + asm_condition(tokens[1]) + asm_addr_signed(tokens[2])
+            if opcode == "jumpif" and token_count == 3:
+                instruction_encoding = "1011 " + asm_condition(tokens[1]) + \
+                                       asm_addr_signed(tokens[2], iteration)
             if opcode == "or2" and token_count==3:
                 instruction_encoding = "110000 " + asm_reg(tokens[1]) + asm_reg(tokens[2])
             if opcode == "or2i" and token_count==3:
@@ -232,7 +242,7 @@ def asm_pass(iteration, s_file):
                 instruction_encoding = "110100 " + asm_counter(tokens[1]) + asm_size(tokens[2]) + \
                                        asm_reg(tokens[3])
             if opcode == "call" and token_count == 2:
-                instruction_encoding = "110101 " + asm_addr_signed(tokens[1])
+                instruction_encoding = "110101 " + asm_addr_signed(tokens[1], iteration)
             if opcode == "setctr" and token_count == 3:
                 instruction_encoding = "110110 " + asm_counter(tokens[1]) + asm_reg(tokens[2])
             if opcode == "getctr" and token_count == 3:
@@ -253,6 +263,13 @@ def asm_pass(iteration, s_file):
             if opcode == "sub3i" and token_count == 4:
                 instruction_encoding = "1110101 " + asm_reg(tokens[1]) + asm_reg(tokens[2]) + \
                                        asm_const_signed(tokens[3])
+            if opcode == "and3" and token_count == 4:
+                instruction_encoding = "1110110 " + asm_reg(tokens[1]) + asm_reg(tokens[2]) + \
+                                       asm_reg(tokens[3])
+            if opcode == "and3i" and token_count == 4:
+                instruction_encoding = "1110111 " + asm_reg(tokens[1]) + asm_reg(tokens[2]) + \
+                                       asm_const_signed(tokens[3])
+    
             if opcode == "or3" and token_count == 4:
                 instruction_encoding = "1111000 " + asm_reg(tokens[1]) + asm_reg(tokens[2]) + \
                                        asm_reg(tokens[3])
