@@ -14,6 +14,7 @@ class Processor {
 	void read_const_from_pc(uint64_t& var,bool sex);
 	//lit la constante, puis stocke sa valeur dans var
 	//(sex?avec:sans) extension de signe
+	//!!! la constante 1 est toujours prise sans extension
 	void read_addr_from_pc(uword& var);
 	//lit l'addresse et la stocke dans var
 	void read_shiftval_from_pc(int& var);

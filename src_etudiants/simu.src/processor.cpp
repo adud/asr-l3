@@ -101,7 +101,7 @@ void Processor::von_Neuman_step(bool debug) {
 		break;
 	case 0x5://cmpi
 		read_reg_from_pc(regnum1);
-		read_const_from_pc(constop,false);
+		read_const_from_pc(constop,true);
 		uop1=r[regnum1];
 		uop2=constop;
 		fullr = ((doubleword) uop1) - ((doubleword) uop2);
@@ -530,7 +530,7 @@ void Processor::read_const_from_pc(uint64_t& var,bool sex) {
 		pc++;
 	}		
 
-	if(sex){
+	if(sex&&(size!=1)){
 	  int sign=(var >> (size-1)) & 1;
 	  for (int i=size; i<WORDSIZE; i++)
 	    var += sign << i;
