@@ -247,6 +247,24 @@ void Processor::von_Neuman_step(bool debug) {
 		break; // Do not forget this break! 
 		
 	case 0xe:
+		//read 3 more bits
+		read_bit_from_pc(opcode);
+		read_bit_from_pc(opcode);
+		read_bit_from_pc(opcode);
+		switch(opcode){
+		case 0b1110000://push (sans size !!!)
+			read_reg_from_pc(regnum1);
+			uop1 = r[regnum1];
+   			sp -= WORDSIZE;
+			m->set_counter(SP,sp);
+			for(int i=WORDSIZE-1;i>=0;i--)
+				m->write_bit(SP,(uop1>>i)&1);
+			m->set_counter(SP,sp);
+			manage_flags = false;
+			break;
+			
+		}
+		break;
 	case 0xf:
 		//read 3 more bits
 		read_bit_from_pc(opcode);
