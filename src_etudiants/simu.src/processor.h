@@ -43,8 +43,10 @@ class Processor {
 	bool zflag;
 	bool cflag;
 	bool nflag;
+	bool vflag; //ajout pour maxint >s minint (ce serait bien)
 };
 
 int sizeval(int size);//la table 2 size
-
-
+bool sum_overflow(uword,uword,uword);
+bool diff_overflow(uword,uword,uword);
+//calcul du flag d'overflow (drapeau de depassement en comp a 2)

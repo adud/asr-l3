@@ -35,7 +35,6 @@ void Processor::von_Neuman_step(bool debug) {
 	doubleword fullr=0;
 	bool manage_flags=false; // used to factor out the flag management code
 	int instr_pc = pc; // for the debug output
-	
 	// read 4 bits.
 	read_bit_from_pc(opcode);
 	read_bit_from_pc(opcode);
@@ -52,6 +51,7 @@ void Processor::von_Neuman_step(bool debug) {
 		fullr = ((doubleword) uop1) + ((doubleword) uop2); // for flags
 		ur = uop1 + uop2;
 		r[regnum1] = ur;
+		vflag = sum_overflow(uop1,uop2,ur);
 		manage_flags=true;
 		break;
 
@@ -63,11 +63,52 @@ void Processor::von_Neuman_step(bool debug) {
 		fullr = ((doubleword) uop1) + ((doubleword) uop2); // for flags
 		ur = uop1 + uop2;
 		r[regnum1] = ur;
+		vflag = sum_overflow(uop1,uop2,ur);
 		manage_flags=true;
 		break;
 
-
-		
+	case 0x2://sub2
+		read_reg_from_pc(regnum1);
+		read_reg_from_pc(regnum2);
+		uop1=r[regnum1];
+		uop2=r[regnum2];
+		fullr = ((doubleword) uop1) - ((doubleword) uop2);
+		ur = uop1 - uop2;
+		r[regnum1] = ur;
+		vflag = diff_overflow(uop1,uop2,ur);
+		manage_flags=true;
+		break;
+	case 0x3://sub2i
+		read_reg_from_pc(regnum1);
+		read_const_from_pc(constop,false);
+		uop1=r[regnum1];
+		uop2=constop;
+		fullr = ((doubleword) uop1) - ((doubleword) uop2);
+		ur = uop1 - uop2;
+		r[regnum1] = ur;
+		vflag = diff_overflow(uop1,uop2,ur);
+		manage_flags=true;
+		break;
+	case 0x4://cmp
+		read_reg_from_pc(regnum1);
+		read_reg_from_pc(regnum2);
+		uop1=r[regnum1];
+		uop2=r[regnum2];
+		fullr = ((doubleword) uop1) - ((doubleword) uop2);
+		ur = uop1 - uop2;
+		vflag = diff_overflow(uop1,uop2,ur);
+		manage_flags=true;
+		break;
+	case 0x5://cmpi
+		read_reg_from_pc(regnum1);
+		read_const_from_pc(constop,false);
+		uop1=r[regnum1];
+		uop2=constop;
+		fullr = ((doubleword) uop1) - ((doubleword) uop2);
+		ur = uop1 - uop2;
+		vflag = diff_overflow(uop1,uop2,ur);
+		manage_flags=true;
+		break;
 	case 0x6://let
 		read_reg_from_pc(regnum1);
 		read_reg_from_pc(regnum2);
@@ -96,7 +137,8 @@ void Processor::von_Neuman_step(bool debug) {
 		}
 		r[regnum1] = ur;
 		zflag = (ur==0);
-		// no change to nflag
+		// no change to nflag ????
+		vflag = false;
 		manage_flags=false;		
 		break;
 
@@ -166,6 +208,7 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = r[regnum2];
 			ur = uop1|uop2;
 			r[regnum1] = ur;
+			vflag = false;
 			manage_flags=true;
 			break;
 
@@ -176,6 +219,7 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = constop;
 			ur = uop1|uop2;
 			r[regnum1] = ur;
+			vflag = false;
 			manage_flags=true;
 			break;
 			
@@ -186,6 +230,7 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = r[regnum2];
 			ur = uop1&uop2;
 			r[regnum1] = ur;
+			vflag = false;
 			manage_flags=true;
 			break;
 
@@ -196,6 +241,7 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = constop;
 			ur = uop1&uop2;
 			r[regnum1] = ur;
+			vflag = false;
 			manage_flags=true;
 			break;
 			
@@ -277,6 +323,7 @@ void Processor::von_Neuman_step(bool debug) {
 			fullr = ((doubleword) uop1) + ((doubleword) uop2); // for flags
 			ur = uop1 + uop2;
 			r[regnum1] = ur;
+			vflag = sum_overflow(uop1,uop2,ur);
 			manage_flags=true;
 			break;
 		case 0b1110011://add3i
@@ -288,6 +335,31 @@ void Processor::von_Neuman_step(bool debug) {
 			fullr = ((doubleword) uop1) + ((doubleword) uop2); // for flags
 			ur = uop1 + uop2;
 			r[regnum1] = ur;
+			vflag = sum_overflow(uop1,uop2,ur);
+			manage_flags=true;
+			break;
+		case 0x1110100://sub3
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_reg_from_pc(regnum3);
+			uop1=r[regnum2];
+			uop2=r[regnum3];
+			fullr = ((doubleword) uop1) - ((doubleword) uop2);
+			ur = uop1 - uop2;
+			r[regnum1] = ur;
+			vflag = diff_overflow(uop1,uop2,ur);
+			manage_flags=true;
+			break;
+		case 0x1110101://sub3i
+			read_reg_from_pc(regnum1);
+			read_reg_from_pc(regnum2);
+			read_const_from_pc(constop,false);
+			uop1=r[regnum2];
+			uop2=constop;
+			fullr = ((doubleword) uop1) - ((doubleword) uop2);
+			ur = uop1 - uop2;
+			r[regnum1] = ur;
+			vflag = diff_overflow(uop1,uop2,ur);
 			manage_flags=true;
 			break;
 			
@@ -299,6 +371,7 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = r[regnum3];
 			ur = uop1&uop2;
 			r[regnum1] = ur;
+			vflag = false;
 			manage_flags=true;
 			break;
 
@@ -310,6 +383,7 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = constop;
 			ur = uop1&uop2;
 			r[regnum1] = ur;
+			vflag = false;
 			manage_flags=true;
 			break;
 			
@@ -330,6 +404,7 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = r[regnum3];
 			ur = uop1|uop2;
 			r[regnum1] = ur;
+			vflag = false;
 			manage_flags=true;
 			break;
 
@@ -341,6 +416,7 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = constop;
 			ur = uop1|uop2;
 			r[regnum1] = ur;
+			vflag = false;
 			manage_flags=true;
 			break;
 			
@@ -352,6 +428,7 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = r[regnum3];
 			ur = uop1^uop2;
 			r[regnum1] = ur;
+			vflag = false;
 			manage_flags=true;
 			break;
 
@@ -363,6 +440,7 @@ void Processor::von_Neuman_step(bool debug) {
 			uop2 = constop;
 			ur = uop1^uop2;
 			r[regnum1] = ur;
+			vflag = false;
 			manage_flags=true;
 			break;
 
@@ -378,6 +456,7 @@ void Processor::von_Neuman_step(bool debug) {
 			cflag = ( ((uop1 >> (shiftval-1))&1) == 1);
 			zflag = (ur==0);
 			nflag = (0 > (sword) ur);
+			vflag = false;
 			manage_flags=false;
 			break;
 		}
@@ -402,7 +481,7 @@ void Processor::von_Neuman_step(bool debug) {
 				 << " ma0=" << hex << setw(8) << setfill('0') << m->counter[2] 
 				 << " ma1=" << hex << setw(8) << setfill('0') << m->counter[3] << ") ";
 			//				 << " newpc=" << hex << setw(9) << setfill('0') << pc;
-		cout << " zcn = " << (zflag?1:0) << (cflag?1:0) << (nflag?1:0);
+		cout << " zcnv = " << (zflag?1:0) << (cflag?1:0) << (nflag?1:0) << (vflag?1:0);
 		for (int i=0; i<8; i++)
 			cout << " r"<< dec << i << "=" << hex << setw(8) << setfill('0') << r[i];
 		cout << endl;
@@ -525,9 +604,18 @@ bool Processor::cond_true(int cond) {
 		break;
 		// begin sabote
 	case 2 :
-		return !zflag && !nflag;
+		return (nflag == vflag)&&(!zflag);
 	case 3 :
-		return nflag;
+		return nflag!=vflag;
+	case 4 :
+		return !(zflag||cflag);
+	case 5 :
+		return !cflag;
+	case 6 :
+		return cflag;
+	case 7 :
+		return zflag || cflag;
+		
 // end sabote
 		
 	}
@@ -585,4 +673,14 @@ int sizeval(int size){
 	case 0b111:return 64;
 	}
 	return 0;
+}
+
+bool sum_overflow(uword uop1, uword uop2, uword ur)
+{
+	return ((uop1>>(WORDSIZE-1))==(uop2>>(WORDSIZE-1)))&&((ur>>(WORDSIZE-1))!=(uop1>>(WORDSIZE-1)));
+}
+
+bool diff_overflow(uword uop1, uword uop2, uword ur)
+{
+	return sum_overflow(ur,uop2,uop1);
 }
