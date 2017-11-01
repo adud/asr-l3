@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python
+#!/usr/bin/env python
 
 # This program assembles source assembly code into a bit string.
 # The bit string includes spaces and newlines for readability,
@@ -13,7 +13,16 @@ from numpy import binary_repr
 
 line=0 # global variable to make error reporting easier
 current_address=0 # idem
-labels={} # global because shared between the two passe
+labels={} # this dictionnary should not change during a pass
+end_of_instr = {}
+# for each relative jump instruction, maps the line of the instruction
+# to the address at the end of the instruction. It should not change
+# during a pass.
+size_of_address = {}
+# For each jump instruction, maps the line of the instruction to the
+# size of the address operand contained in the instruction.
+
+nb_iterations = 4
 
 def error(e):
     raise BaseException("Error at line " + str(line) + " : " + e)
@@ -56,26 +65,43 @@ def asm_addr_signed(s, iteration, instruction):
             return '110 ' + binary_repr(val, 32)
         else:
             return '111 ' +  binary_repr(val, 64)
+        
     elif iteration == 1:
-        # À la première itération, les liens vers les labels ne sont pas faits.
-        # Nous allons remplacer toutes les adresses par des mots de 32 bits,
-        # ne connaissant pas l'adresse exacte, les bits sont remplacés par des
-        # points d'interrogations.
+        # In the first pass, there is no way to know how much bits the
+        # the address take. We assume that the address takes the maximum
+        # size, which is 32. Unknown bits are replaced by question marks.
         return "110 " + "?" * 32
-    elif iteration == 2:
-        if instruction == "jump":
-            address = current_address + 4 + (3 + 32)
-            # The address after having read jump addr.
-            # jump takes 4 bits, and the address takes 3 + 32 bits.
-            return "110 " + binary_repr(labels[s] - address, 32)
-        elif instruction == "jumpif":
-            address = current_address + 4 + 3 + (3 + 32)
-            # The address after having read jumpif cond addr.
-            # jumpif takes 4 bits, cond takes 3 bits and the address takes
-            # 3 + 32 bits.
-            return "110 " + binary_repr(labels[s] - address, 32)
+    
+    elif iteration < nb_iterations:
+        # In the intermediates passes, we try to reduce the size taken by
+        # the address.
+        if instruction in ("jump", "jumpif"):
+            address = labels[s] - end_of_instr[line]
         else: # instruction == "call"
-            return "110 " + binary_repr(labels[s], 32)
+            address = labels[s]
+        # How much bits are needed to store the address ?
+        if -128 <= address < 128:
+            size_of_address[line] = 8
+            return "0 " + "?" * 8
+        elif (-1 << 15) <= address < (1 << 15):
+            size_of_address[line] = 16
+            return "10 " + "?" * 16
+        else:
+            size_of_address[line] = 32
+            return "110 " + "?" * 32
+        
+    elif iteration == nb_iterations:
+        # In the final pass, the address is finally given without any
+        # question marks.
+        if instruction in ("jump", "jumpif"):
+            address = labels[s] - end_of_instr[line]
+        else: # instruction == "call"
+            address = labels[s]
+        size = size_of_address[line]
+        prefixes = {8:"0 ", 16:"10 ", 32:"110 "}
+        print address
+        return prefixes[size] + binary_repr(address, size)
+            
     else:
         error("The label expansion at the iteration %d is not supported"
               % iteration)
@@ -185,7 +211,11 @@ def asm_pass(iteration, s_file):
     global line
     global labels
     global current_address
+    global end_of_instr
     code =[] # array of strings, one entry per instruction
+    line = 0
+    new_labels = {}
+    new_end_of_instr = {}
     print "\n PASS " + str(iteration)
     current_address = 0
     source = open(s_file)
@@ -207,7 +237,7 @@ def asm_pass(iteration, s_file):
             token=tokens[0]
             if token[-1] == ":": # last character
                 label = token[0: -1] # all the characters except last one
-                labels[label] = current_address
+                new_labels[label] = current_address
                 tokens = tokens[1:]
 
         # now all that remains should be an instruction... or nothing
@@ -314,11 +344,15 @@ def asm_pass(iteration, s_file):
                 print "... @" + str(current_address) + " " + binary_repr(current_address,16) + "  :  " + compact_encoding
                 print  "                          "+  instruction_encoding+ "   size=" + str(instr_size)    
                 current_address += instr_size
+                if opcode in ("jump", "jumpif"):
+                    new_end_of_instr[line] = current_address
 
                 
         line += 1
         code.append(instruction_encoding)
     source.close()
+    labels = new_labels
+    end_of_instr = new_end_of_instr
     return code
 
 
@@ -334,9 +368,9 @@ if __name__ == '__main__':
     filename = options.filename
     basefilename, extension = os.path.splitext(filename)
     obj_file = basefilename+".obj"
-    code = asm_pass(1, filename) # first pass essentially builds the labels
 
-    code = asm_pass(2, filename)
+    for i in range(1, nb_iterations + 1):
+        code = asm_pass(i, filename)
     
     # statistics
     print "Average instruction size is " + str(1.0*current_address/len(code))
