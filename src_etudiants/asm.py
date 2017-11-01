@@ -12,7 +12,7 @@ import argparse
 from numpy import binary_repr
 
 line=0 # global variable to make error reporting easier
-current_addr=0 # idem
+current_address=0 # idem
 labels={} # global because shared between the two passe
 
 def error(e):
@@ -60,9 +60,10 @@ def asm_addr_signed(s, iteration):
         # points d'interrogations.
         return "111 " + "?" * 64
     elif iteration == 2:
-        return "111 " + binary_repr(labels[s], 64)
+        return "111 " + binary_repr(labels[s] - current_address, 64)
     else:
-        error("Fixme! labels currently unsupported")
+        error("The label expantion at the iteration %d is not supported"
+              % iteration)
     
     
 
