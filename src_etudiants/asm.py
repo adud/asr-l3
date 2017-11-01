@@ -38,8 +38,11 @@ def asm_reg(s):
 
 
 
-def asm_addr_signed(s, iteration):
-    "converts the string s into its encoding"
+def asm_addr_signed(s, iteration, instruction):
+    """Converts the string s into its encoding
+
+    iteration : the number of the pass
+    instruction : either 'jump', 'jumpif' or 'call'."""
     # Is it a label or a constant? 
     if (s[0]>='0' and s[0]<='9') or s[0]=='-' or s[0]=='+' or s[0:2] == "0x" \
        or s[0:3] == "-0x":
@@ -55,14 +58,26 @@ def asm_addr_signed(s, iteration):
             return '111 ' +  binary_repr(val, 64)
     elif iteration == 1:
         # À la première itération, les liens vers les labels ne sont pas faits.
-        # Nous allons remplacer toutes les adresses par des mots de 64 bits,
+        # Nous allons remplacer toutes les adresses par des mots de 32 bits,
         # ne connaissant pas l'adresse exacte, les bits sont remplacés par des
         # points d'interrogations.
-        return "111 " + "?" * 64
+        return "110 " + "?" * 32
     elif iteration == 2:
-        return "111 " + binary_repr(labels[s] - current_address, 64)
+        if instruction == "jump":
+            address = current_address + 4 + (3 + 32)
+            # The address after having read jump addr.
+            # jump takes 4 bits, and the address takes 3 + 32 bits.
+            return "110 " + binary_repr(labels[s] - address, 32)
+        elif instruction == "jumpif":
+            address = current_address + 4 + 3 + (3 + 32)
+            # The address after having read jumpif cond addr.
+            # jumpif takes 4 bits, cond takes 3 bits and the address takes
+            # 3 + 32 bits.
+            return "110 " + binary_repr(labels[s] - address, 32)
+        else: # instruction == "call"
+            return "110 " + binary_repr(labels[s], 32)
     else:
-        error("The label expantion at the iteration %d is not supported"
+        error("The label expansion at the iteration %d is not supported"
               % iteration)
     
     
@@ -226,11 +241,11 @@ def asm_pass(iteration, s_file):
                                        asm_reg(tokens[3])
             # Here, a lot of constructive copypaste, for instance
             if opcode == "jump" and token_count==2:
-                instruction_encoding = "1010 " + asm_addr_signed(tokens[1], iteration)
+                instruction_encoding = "1010 " + asm_addr_signed(tokens[1], iteration, "jump")
             #begin sabote
             if opcode == "jumpif" and token_count == 3:
                 instruction_encoding = "1011 " + asm_condition(tokens[1]) + \
-                                       asm_addr_signed(tokens[2], iteration)
+                                       asm_addr_signed(tokens[2], iteration, "jumpif")
             if opcode == "or2" and token_count==3:
                 instruction_encoding = "110000 " + asm_reg(tokens[1]) + asm_reg(tokens[2])
             if opcode == "or2i" and token_count==3:
@@ -243,7 +258,7 @@ def asm_pass(iteration, s_file):
                 instruction_encoding = "110100 " + asm_counter(tokens[1]) + asm_size(tokens[2]) + \
                                        asm_reg(tokens[3])
             if opcode == "call" and token_count == 2:
-                instruction_encoding = "110101 " + asm_addr_signed(tokens[1], iteration)
+                instruction_encoding = "110101 " + asm_addr_signed(tokens[1], iteration, "call")
             if opcode == "setctr" and token_count == 3:
                 instruction_encoding = "110110 " + asm_counter(tokens[1]) + asm_reg(tokens[2])
             if opcode == "getctr" and token_count == 3:
@@ -321,8 +336,8 @@ if __name__ == '__main__':
     obj_file = basefilename+".obj"
     code = asm_pass(1, filename) # first pass essentially builds the labels
 
-     # code = asm_pass(2, filename) # second pass is for good, but is disabled now
-
+    code = asm_pass(2, filename)
+    
     # statistics
     print "Average instruction size is " + str(1.0*current_address/len(code))
     
