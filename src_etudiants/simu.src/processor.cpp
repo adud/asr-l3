@@ -338,7 +338,7 @@ void Processor::von_Neuman_step(bool debug) {
 			vflag = sum_overflow(uop1,uop2,ur);
 			manage_flags=true;
 			break;
-		case 0x1110100://sub3
+		case 0b1110100://sub3
 			read_reg_from_pc(regnum1);
 			read_reg_from_pc(regnum2);
 			read_reg_from_pc(regnum3);
@@ -350,7 +350,7 @@ void Processor::von_Neuman_step(bool debug) {
 			vflag = diff_overflow(uop1,uop2,ur);
 			manage_flags=true;
 			break;
-		case 0x1110101://sub3i
+		case 0b1110101://sub3i
 			read_reg_from_pc(regnum1);
 			read_reg_from_pc(regnum2);
 			read_const_from_pc(constop,false);
