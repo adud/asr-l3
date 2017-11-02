@@ -22,6 +22,7 @@ size_of_address = {}
 # For each jump instruction, maps the line of the instruction to the
 # size of the address operand contained in the instruction.
 
+WORDSIZE = 32 #must be the same in simu.src/types.h
 nb_iterations = 4
 
 def error(e):
@@ -196,7 +197,7 @@ def asm_size(s):
         val = codelist[s]
         return val + " "
     else:
-        error("Invalid size: " + size)
+        error("Invalid size: " + str(s))
 
 
 def asm_dir(dir):
@@ -295,6 +296,10 @@ def asm_pass(iteration, s_file):
                 instruction_encoding = "110111 " + asm_counter(tokens[1]) + asm_reg(tokens[2])
             if opcode == "push" and token_count == 2:
                 instruction_encoding = "1110000 " + asm_reg(tokens[1])
+            if opcode == "pop" and token_count ==2:
+                #not really an opcode, only syntax sugar for readse sp WORDSIZE  
+                instruction_encoding = "10011 " + asm_counter("sp") +\
+                                       asm_size(str(WORDSIZE)) + asm_reg(tokens[1])
             if opcode == "return" and token_count == 1:
                 instruction_encoding = "1110001"
             if opcode == "add3" and token_count == 4:
