@@ -298,7 +298,7 @@ def asm_pass(iteration, s_file):
                 instruction_encoding = "1110000 " + asm_reg(tokens[1])
             if opcode == "pop" and token_count ==2:
                 #not really an opcode, only syntax sugar for readse sp WORDSIZE  
-                instruction_encoding = "10011 " + asm_counter("sp") +\
+                instruction_encoding = "10010 " + asm_counter("sp") +\
                                        asm_size(str(WORDSIZE)) + asm_reg(tokens[1])
             if opcode == "return" and token_count == 1:
                 instruction_encoding = "1110001"
