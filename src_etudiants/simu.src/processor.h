@@ -51,3 +51,5 @@ int sizeval(int size);//la table 2 size
 bool sum_overflow(uword,uword,uword);
 bool diff_overflow(uword,uword,uword);
 //calcul du flag d'overflow (drapeau de depassement en comp a 2)
+char* codename(int opcode);
+//retourne une chaine contenant le nom de l'operation de no opcode

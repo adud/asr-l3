@@ -473,16 +473,20 @@ void Processor::von_Neuman_step(bool debug) {
 	}
 
 	if (debug) {
-		cout << "after instr: " << opcode 
-				 << " at pc=" << hex << setw(8) << setfill('0') << instr_pc
-				 << " (newpc=" << hex << setw(8) << setfill('0') << pc
-				 << " mpc=" << hex << setw(8) << setfill('0') << m->counter[0] 
-				 << " msp=" << hex << setw(8) << setfill('0') << m->counter[1] 
-				 << " ma0=" << hex << setw(8) << setfill('0') << m->counter[2] 
-				 << " ma1=" << hex << setw(8) << setfill('0') << m->counter[3] << ") ";
+	  cout << "after instr: " << codename(opcode) 
+	       << " at pc=" << hex << setw(8) << setfill('0') << instr_pc
+	       << " (newpc=" << hex << setw(8) << setfill('0') << pc << ")" <<  endl;
+	  cout << " zcnv = " << (zflag?1:0) << (cflag?1:0) << (nflag?1:0) << (vflag?1:0) << endl;
+	  cout << " pc=" << hex << setw(8) << setfill('0') << m->counter[0] 
+				 << " sp=" << hex << setw(8) << setfill('0') << m->counter[1] 
+				 << " a0=" << hex << setw(8) << setfill('0') << m->counter[2] 
+	       << " a1=" << hex << setw(8) << setfill('0') << m->counter[3] << endl ;
 			//				 << " newpc=" << hex << setw(9) << setfill('0') << pc;
-		cout << " zcnv = " << (zflag?1:0) << (cflag?1:0) << (nflag?1:0) << (vflag?1:0);
-		for (int i=0; i<8; i++)
+	  
+		for (int i=0; i<4; i++)
+			cout << " r"<< dec << i << "=" << hex << setw(8) << setfill('0') << r[i];
+		cout << endl;
+		for (int i=4;i<8;i++)
 			cout << " r"<< dec << i << "=" << hex << setw(8) << setfill('0') << r[i];
 		cout << endl;
 	}
@@ -683,4 +687,21 @@ bool sum_overflow(uword uop1, uword uop2, uword ur)
 bool diff_overflow(uword uop1, uword uop2, uword ur)
 {
 	return sum_overflow(ur,uop2,uop1);
+}
+
+char t0[12][7] = {"add2","add2i","sub2","sub2i","cmp","cmpi","let","leti","shift","tsnh","jump","jumpif"};
+char t9[2][7] = {"readze","readse"};
+char t6[8][7] = {"or2","or2i","and2","and2i","write","call","setctr","getctr"};
+char t7[16][7] = {"push","return","add3","add3i","sub3","sub3i","and3","and3i","or3","or3i","xor3","xor3i","asr3","?","?","?"};
+
+char* codename(int opcode)
+{
+  switch(opcode>>4){
+  case 0: return t0[opcode];
+  case 7: return t7[opcode&15];
+  case 3: return t6[opcode&7];
+  case 1: return t9[opcode&1];
+  }
+  cout << "oups !!!";
+  return NULL;
 }
