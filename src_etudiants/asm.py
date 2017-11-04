@@ -77,9 +77,15 @@ def asm_addr_signed(s, iteration, instruction):
         # In the intermediates passes, we try to reduce the size taken by
         # the address.
         if instruction in ("jump", "jumpif"):
-            address = labels[s] - end_of_instr[line]
+            try:
+                address = labels[s] - end_of_instr[line]
+            except KeyError:
+                error("unknown label : "+s)
         else: # instruction == "call"
-            address = labels[s]
+            try:
+                address = labels[s]
+            except KeyError:
+                error("unknown label : "+s)
         # How much bits are needed to store the address ?
         if -128 <= address < 128:
             size_of_address[line] = 8
