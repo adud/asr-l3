@@ -1,5 +1,5 @@
 	;;Multiplication :
-	;; si avant appel r0=A,r1=B
+	;; si avant appel r0=A,r1=B, A*B < 2**16
 	;; apres appel r2=A*B
 	leti r0 1928
 	leti r1 2893
