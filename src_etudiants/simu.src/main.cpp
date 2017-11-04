@@ -40,7 +40,7 @@ void usage() {
 }
 
 int main(int argc, char* argv[]) {
-
+	
 	if(argc==1) {
 		usage();
 	}
@@ -50,11 +50,10 @@ int main(int argc, char* argv[]) {
  
 	std::string filename = argv[argc-1];
 	std::ifstream f(filename.c_str());
-  if(!f.good()) {
+	if(!f.good()) {
 		std::cerr << "can't access obj file" << std::endl;
 		usage();
 	}
-
 	Memory* m;
 	Processor* p;
 	std::thread* screen;
@@ -68,12 +67,35 @@ int main(int argc, char* argv[]) {
 	if(graphical_output)
 		screen=new std::thread(simulate_screen, m, &refresh);
 
+	
+	char sin;//for step-by-step
+	int lastopc(0);
+	bool ppl(true);
+	int prof(0);//for step-by-step
 	// The von Neuman cycle
 	while(1+1==2) {
-		p->von_Neuman_step(debug);
-		
-		if(step_by_step)
-			getchar();
+		lastopc = p->von_Neuman_step(debug&&ppl);
+		if(step_by_step){
+			if(ppl){
+				
+				sin=getchar();
+				if(sin!='\n')
+					getchar();
+				if(lastopc==0x35&&sin=='n')//call
+				{
+					ppl=false;
+					prof=1;
+				}
+			}
+			else{
+				switch(lastopc){
+				case 0x35:prof++;break; //call
+				case 0x71:prof--;break; //return
+				}
+				ppl=(prof==0);
+			}
+			
+		}
 	};
 
 	if(graphical_output)

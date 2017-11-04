@@ -14,7 +14,7 @@ Processor::~Processor()
 {}
 
 
-void Processor::von_Neuman_step(bool debug) {
+int Processor::von_Neuman_step(bool debug) {
 	// numbers read from the binary code
 	int opcode=0;
 	int regnum1=0;
@@ -490,6 +490,7 @@ void Processor::von_Neuman_step(bool debug) {
 			cout << " r"<< dec << i << "=" << hex << setw(8) << setfill('0') << r[i];
 		cout << endl;
 	}
+	return opcode;
 }
 
 
