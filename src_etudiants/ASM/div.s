@@ -18,7 +18,7 @@ mainloop:
 	shift right r3 1 ; par la suite, on décale r3 vers la gauche à chaque tour
 	shift left r2 1	 ;inv : r0+r1*r2
 	cmp r0 r3	 ;inv : r0 < r3
-	jumpif lt cond	 ;nb bits lus <83
+	jumpif lt cond	 ;nb bits lus <93
 	sub2 r0 r3
 	add2i r2 1
 cond: ; On s'arrête quand r3 vaut de r1.
