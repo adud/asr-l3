@@ -18,7 +18,7 @@ src_etudiants/simu
 
 #plus besoin de conserver les compilations : l'assembleur marche
 *.obj
-src_etudiants/ASM/test.s
+#src_etudiants/ASM/test.s
 
 src_etudiants/bitmap/piltest.py
 
