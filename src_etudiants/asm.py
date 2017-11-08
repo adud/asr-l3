@@ -192,7 +192,7 @@ def asm_counter(ctr):
         val = codelist[ctr]
         return val + " "
     else:
-        error("Invalid counter: " + cond)
+        error("Invalid counter: " + ctr)
 
 
 
