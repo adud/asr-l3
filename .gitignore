@@ -20,8 +20,6 @@ src_etudiants/simu
 *.obj
 #src_etudiants/ASM/test.s
 
-src_etudiants/bitmap/piltest.py
-
 
 *.html
 #pour la lecture de .md avec emacs
