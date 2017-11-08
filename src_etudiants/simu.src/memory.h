@@ -31,7 +31,7 @@ class Memory {
 	void set_counter(int ctr, uword val);
 
 	/** method called to initialize the memory */
-	void fill_with_obj_file(std::string filename);
+	void fill_with_obj_file(std::string filename,uint64_t pos=0);
 
 	Memory();
 	~Memory();
