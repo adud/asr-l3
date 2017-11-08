@@ -19,9 +19,3 @@
   * `div.s` pour la division
   * `mults.s` pour la multiplication signée
   * `mult16.s` pour la multiplication 16 bits
-
-## Remarques ##
-
-  * Pourquoi les sauts absolus sont-ils signés ?
-  * 4 pointeurs, dont 2 utilisables, c'est vraiment **très** peu
-  * assembler les distances de saut à la main, **plus jamais** (surtout avec des opérandes de taille variable).
