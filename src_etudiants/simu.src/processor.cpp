@@ -214,7 +214,7 @@ int Processor::von_Neuman_step(bool debug) {
 
 		case 0b110001://or2i
 			read_reg_from_pc(regnum1);
-			read_const_from_pc(constop,true);
+			read_const_from_pc(constop,false);
 			uop1 = r[regnum1];
 			uop2 = constop;
 			ur = uop1|uop2;
@@ -236,7 +236,7 @@ int Processor::von_Neuman_step(bool debug) {
 
 		case 0b110011://and2i
 			read_reg_from_pc(regnum1);
-			read_const_from_pc(constop,true);
+			read_const_from_pc(constop,false);
 			uop1 = r[regnum1];
 			uop2 = constop;
 			ur = uop1&uop2;
@@ -378,7 +378,7 @@ int Processor::von_Neuman_step(bool debug) {
 		case 0b1110111://and3i
 			read_reg_from_pc(regnum1);
 			read_reg_from_pc(regnum2);
-			read_const_from_pc(constop,true);
+			read_const_from_pc(constop,false);
 			uop1 = r[regnum2];
 			uop2 = constop;
 			ur = uop1&uop2;
@@ -411,7 +411,7 @@ int Processor::von_Neuman_step(bool debug) {
 		case 0b1111001://or3i
 			read_reg_from_pc(regnum1);
 			read_reg_from_pc(regnum2);
-			read_const_from_pc(constop,true);
+			read_const_from_pc(constop,false);
 			uop1 = r[regnum2];
 			uop2 = constop;
 			ur = uop1|uop2;
@@ -435,7 +435,7 @@ int Processor::von_Neuman_step(bool debug) {
 		case 0b1111011://xor3i
 			read_reg_from_pc(regnum1);
 			read_reg_from_pc(regnum2);
-			read_const_from_pc(constop,true);
+			read_const_from_pc(constop,false);
 			uop1 = r[regnum2];
 			uop2 = constop;
 			ur = uop1^uop2;
@@ -535,7 +535,7 @@ void Processor::read_const_from_pc(uint64_t& var,bool sex) {
 		pc++;
 	}		
 
-	if(sex&&(size!=1)){
+	if(sex){
 	  int sign=(var >> (size-1)) & 1;
 	  for (int i=size; i<WORDSIZE; i++)
 	    var += sign << i;

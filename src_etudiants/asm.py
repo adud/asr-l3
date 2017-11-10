@@ -146,8 +146,10 @@ def asm_const_signed(s):
             val=int(s,0)
         except ValueError:
             error("Expecting a constant, got " + s)
-        if val==0 or val==1:
-            return '0 ' + str(val)
+        if val==0:
+            return '0 0'
+        elif val==-1:
+            return '0 1'
         elif -128 <= val < 128:
             return '10 ' + binary_repr(val, 8)
         elif  (-1 << 31) <= val < (1 << 31):
