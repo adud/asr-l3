@@ -1,3 +1,5 @@
+; juste pour tester le préprocesseur :
+#include mult.s
 	leti r0 0x10000
 	setctr a0 r0
 
@@ -38,5 +40,3 @@ fi:
 
 	leti r2 66
 loop:	jump loop
-; juste pour tester le préprocesseur :
-#include mult.s
