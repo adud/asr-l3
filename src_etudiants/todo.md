@@ -6,6 +6,7 @@
 	  * directive `#load` pour décrire un fichier `.mem` (dans le genre `#load 0x60000 war8x8` doit écrire dans un fichier `.mem` : `0x60000 war8x8`(quel fichier, c'est une bonne question))
 	  * directive `#include` pour ajouter un fichier en fin de fichier (par exemple si on veut des multiplications, pouvoir juste écrire `#include mult.s`) mais renommer les labels pour ne pas avoir de collisions (par exemple remplacer tous les `loop` dans `mult` par `mult(caractère réservé)loop`)
 	  * directives `#main` et `#endmain` pour ne pas charger certains morceaux si le fichier est inclus
+	  * directive `#write` pour écrire des phrases à un endroit de la mémoire
   
   * créer des makefiles (pour pouvoir séparer les fichiers `.s` des fichiers `.m` des fichiers `.o`)
   * assembleur
