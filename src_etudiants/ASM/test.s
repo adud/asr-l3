@@ -38,3 +38,5 @@ fi:
 
 	leti r2 66
 loop:	jump loop
+; juste pour tester le préprocesseur :
+#include mult.s

@@ -214,7 +214,90 @@ def asm_dir(dir):
     else:
         error("Invalid direction: " + dir)
 
-def asm_pass(iteration, s_file):
+def get_lines(filename):
+    """Turn the text of a file into a list of lines."""
+    with open(filename) as f:
+        lines = f.readlines()
+    lines = [l[:-1] for l in lines] # remove the last '\n' characters
+    return lines
+
+def include_file(i_file):
+    """Load a file, and return the code lines. If two lines '#main' and
+    '#endmain' are defined, load only the code between these two lines.
+
+    The code lines are returned as a list.
+
+    i_file : the file to include"""
+    global filename
+    
+    if i_file[0] != "/": # relative file name
+        # we want to get the current directory, so everything after the last
+        # "/" character is removed
+        path = filename.split("/")
+        # the 'name' variable replace the last element of 'path'
+        path.pop()
+        path.append(i_file)
+        i_file = "/".join(path)
+
+    lines = get_lines(i_file)
+    
+    main_expr = re.compile("^#main\s*($|;)")
+    endmain_expr = re.compile("^#endmain\s*($|;)")
+
+    main_lines = [i for (i, l) in enumerate(lines)
+                  if main_expr.match(l) is not None]
+    endmain_lines = [i for (i, l) in enumerate(lines)
+                     if endmain_expr.match(l) is not None]
+
+    if main_lines == [] and endmain_lines == []:
+        return lines
+    elif len(main_lines) > 1:
+        raise BaseException("Loading error : too much #main directives.")
+    elif len(endmain_lines) > 1:
+        raise BaseException("Loading error : too much #main directives.")
+    elif main_lines == []:
+        raise BaseException("Loading error : #main directive missing.")
+    elif endmain_lines == []:
+        raise BaseException("Loading error : #endmain directive missing.")
+    else:
+        [main] = main_lines
+        [endmain] = endmain_lines
+        if main >= endmain:
+            raise BaseException("Loading error : #main directive "
+                                "defined after #endmain.")
+
+    return preprocess(lines[main+1:endmain]) # recursively preprocessing the
+                                             # lines
+
+def preprocess(lines):
+    # we assume that the user use neither ';' nor whitespace characters in
+    include_expr = re.compile("^#include (?P<i_file>([^;]|\S)+)\s*($|;)")
+    main_expr = re.compile("^#main\s*($|;)")
+    endmain_expr = re.compile("^#endmain\s*($|;)")
+        
+    final_lines = []
+    for l in lines:
+        if l != "" and l[0] == "#":
+            m = include_expr.match(l)
+            if m is not None:
+                i_file = m.group("i_file")
+                # included lines are added in the file
+                final_lines.extend(include_file(i_file))
+            elif main_expr.match(l) or endmain_expr.match(l):
+                pass
+            else:
+                # this directive is not valid
+                raise BaseException("Don't know what to do with : " + l)
+        else:
+            final_lines.append(l)
+
+    print "After the preprocessing operation :"
+    for l in final_lines:
+        print l
+
+    return final_lines
+
+def asm_pass(iteration, lines):
     global line
     global labels
     global current_address
@@ -225,10 +308,9 @@ def asm_pass(iteration, s_file):
     new_end_of_instr = {}
     print "\n PASS " + str(iteration)
     current_address = 0
-    source = open(s_file)
-    for source_line in source:
+    for source_line in lines:
         instruction_encoding="" 
-        print "processing " + source_line[0:-1] # just to get rid of the final newline
+        print "processing " + source_line # just to get rid of the final newline
 
         # if there is a comment, get rid of it
         index = str.find(source_line, ";")
@@ -361,7 +443,6 @@ def asm_pass(iteration, s_file):
                 
         line += 1
         code.append(instruction_encoding)
-    source.close()
     labels = new_labels
     end_of_instr = new_end_of_instr
     return code
@@ -380,8 +461,9 @@ if __name__ == '__main__':
     basefilename, extension = os.path.splitext(filename)
     obj_file = basefilename+".obj"
 
+    lines = preprocess(get_lines(filename))
     for i in range(1, nb_iterations + 1):
-        code = asm_pass(i, filename)
+        code = asm_pass(i, lines)
     
     # statistics
     print "Average instruction size is " + str(1.0*current_address/len(code))
