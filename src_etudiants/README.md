@@ -11,6 +11,9 @@
 
 ## L'assembleur##
 
+  * Implémentation d'un préprocesseur, possédant actuellement 3 directives `#include`, `#main` et `#endmain`.
+    * `#include [nom-du-fichier]` inclut les lignes d'un fichier donné à la fin. Il est possible d'utiliser un label définit dans ce fichier avec la syntaxe `[nom-du-fichier]$[nom-du-label]`. C'est pour cela que l'utilisation du caractère `$` est interdite dans la définition de label
+    * Les directives `#main` et `#endmain` permettent à un fichier, s'il est inclut, de n'inclure que les lignes de code entre ces deux directives. 
   * La gestion des labels n'est pas garantie optimale
   * `.const` n'est pas encore implanté.
 

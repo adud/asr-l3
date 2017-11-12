@@ -221,7 +221,7 @@ def get_lines(filename):
     lines = [l[:-1] for l in lines] # remove the last '\n' characters
     return lines
 
-def include_file(i_file):
+def include_file(i_file, baselabel):
     """Load a file, and return the code lines. If two lines '#main' and
     '#endmain' are defined, load only the code between these two lines.
 
@@ -229,6 +229,10 @@ def include_file(i_file):
 
     i_file : the file to include"""
     global filename
+
+    # the name of the included file is added after the base label, followed by
+    # the '$' character. This character is reserved.
+    baselabel += i_file + "$"
     
     if i_file[0] != "/": # relative file name
         # we want to get the current directory, so everything after the last
@@ -250,11 +254,12 @@ def include_file(i_file):
                      if endmain_expr.match(l) is not None]
 
     if main_lines == [] and endmain_lines == []:
-        return lines
+        # recursively preprocessing the lines
+        return preprocess(lines, baselabel)
     elif len(main_lines) > 1:
         raise BaseException("Loading error : too much #main directives.")
     elif len(endmain_lines) > 1:
-        raise BaseException("Loading error : too much #main directives.")
+        raise BaseException("Loading error : too much #endmain directives.")
     elif main_lines == []:
         raise BaseException("Loading error : #main directive missing.")
     elif endmain_lines == []:
@@ -266,30 +271,59 @@ def include_file(i_file):
             raise BaseException("Loading error : #main directive "
                                 "defined after #endmain.")
 
-    return preprocess(lines[main+1:endmain]) # recursively preprocessing the
-                                             # lines
+        return preprocess(lines[main+1:endmain], baselabel)
 
-def preprocess(lines):
+def preprocess(lines, baselabel=""):
+    """Apply the preprocesor operations to a list of lines.
+    baselabel is the string that is added before every label."""
     # we assume that the user use neither ';' nor whitespace characters in
     include_expr = re.compile("^#include (?P<i_file>([^;]|\S)+)\s*($|;)")
     main_expr = re.compile("^#main\s*($|;)")
     endmain_expr = re.compile("^#endmain\s*($|;)")
         
     final_lines = []
+    files_to_include = [] # files are included at the end.
     for l in lines:
         if l != "" and l[0] == "#":
+            # this line is a directive
             m = include_expr.match(l)
             if m is not None:
                 i_file = m.group("i_file")
                 # included lines are added in the file
-                final_lines.extend(include_file(i_file))
+                files_to_include.append(i_file)
             elif main_expr.match(l) or endmain_expr.match(l):
                 pass
             else:
                 # this directive is not valid
                 raise BaseException("Don't know what to do with : " + l)
         else:
+            if ";" in l: # remove the 
+                l = l[:l.find(";")]
+            # split the line
+            tokens = re.findall("[\S]+", l)
+            # If there is a label, add the base label before and consume it.
+            if tokens != [] and tokens[0][-1] == ":":
+                label = tokens[0]
+                if "$" in label:
+                    raise BaseException("Error : the label %s contains a '$' "
+                                        "character" % label)
+                label = [baselabel + label]
+                tokens = tokens[1:]
+            else:
+                label = []
+
+            if tokens != [] and tokens[0] in ("call", "jump", "jumpif"):
+                # If there is a jump to a label, add the baselabel before
+                addr = tokens[-1]
+                if addr[0] not in "0123456789+-":
+                    # the address in a label
+                    tokens[-1] = baselabel + addr
+
+            l = " ".join(label + tokens)
             final_lines.append(l)
+
+    for i_file in files_to_include:
+        final_lines.extend(include_file(i_file, baselabel))
 
     print "After the preprocessing operation :"
     for l in final_lines:
