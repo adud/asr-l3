@@ -39,6 +39,7 @@ void usage() {
 		exit(0);
 }
 
+
 int main(int argc, char* argv[]) {
 	
 	if(argc==1) {
@@ -62,6 +63,8 @@ int main(int argc, char* argv[]) {
 	p = new Processor(m);
 
 	m->fill_with_obj_file(filename);
+
+
 	
 	/*load more files in memory
 	  if file.obj is executed, and there is a file file.mem in the 
@@ -70,22 +73,25 @@ int main(int argc, char* argv[]) {
 	  the content of <filename> will be stored in memory in 
 	  <hex address>
 	*/
-	//change filename extension
-	std::string chemin = filename.substr(0,1+filename.find_last_of("/"));
-	//std::cout << chemin;
-	std::string a2mn = filename.substr(0,filename.find_last_of(".")) + ".mem";
-	//thx sof
-	
-	std::ifstream a2mf(a2mn.c_str());
-	std::string nomf;
-	uword pos;
-	while(a2mf >> std::hex >> pos >> nomf)
-	{ 
-		std::cerr << nomf << " in 0x" << std::hex
-			  << pos << " : ";
-		m->fill_with_obj_file(chemin+nomf,pos);
+
+	if(cmdOptionExists(argv,argv+argc, "-m")){
+		//change filename extension
+		std::string chemin = filename.substr(0,1+filename.find_last_of("/"));
+		//std::cout << chemin;
+		std::string a2mn = filename.substr(0,filename.find_last_of(".")) + ".mem";
+		//thx sof
+		
+		std::ifstream a2mf(a2mn.c_str());
+		std::string nomf;
+		uword pos;
+		while(a2mf >> std::hex >> pos >> nomf)
+		{ 
+			std::cerr << nomf << " in 0x" << std::hex
+				  << pos << " : ";
+			m->fill_with_obj_file(chemin+nomf,pos);
+		}
+		a2mf.close();
 	}
-	a2mf.close();
 	
 
 	// create the screen
