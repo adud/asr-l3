@@ -4,9 +4,12 @@
 	leti r0 0x0fff
 	leti r1 0x1001
 	call mult16
-end:
-	jump end
-mult16:
+end:	jump end
+
+#main
+	
+mult16:	push r4
+	push r5
 	leti r4 0 ; si r1 dépasse de 16 bits, les bits restants sont stockés en r4
 	leti r2 0 ; r2 contient les bits de poids fort du résultat
 	leti r3 0 ; r3 contient les bits de poids faible du résultat
@@ -29,4 +32,8 @@ skip:
 cond:
 	cmpi r0 0
 	jumpif nz mainloop
+	pop r5
+	pop r4
 	return
+
+#endmain

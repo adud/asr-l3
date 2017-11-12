@@ -1,25 +1,51 @@
 	leti r0 0x68000
 	setctr a1 r0
-	
 	leti r0 0x10000
 	setctr a0 r0
-	leti r6 0
+	setctr sp r0		;initstack
 	
-	setctr sp r0		;init stack
 
 	leti r0 0b0000000000000000
 	leti r1 0b0000000000111110
 
+	call write
+
+loop:	jump loop
+	
 	;; Ecrire un texte :
 	;; a0 pointe vers l'ecran (est le crayon)
 	;; a1 pointe vers la place du mot en memoire
 	;; r0 couleur de fond
 	;; r1 couleur du texte
+
+	;; au long de l'execution :
 	;; r2 contient le caractere a ecrire
 	;; r3 r4 r5 sont detruits par prchr
 	;; r6 contient la pos sur la ligne
 	;; (evite des divisions par 160...)
 
+#main
+write:	push r2
+	push r3
+	push r4
+	push r5
+	push r6
+
+	let r3 r0		;tout ca pour initialiser r6...
+	let r4 r1
+
+	getctr a0 r0
+	sub2i r0 0x10000
+	leti r1 160
+	push r7
+	call div
+	pop r7
+	let r6 r0
+	
+	let r0 r3
+	let r1 r4		;initialisation terminee
+	
+	
 wh:	readze a1 8 r2
 	cmpi r2 0		;NUL
 	jumpif z out
@@ -46,11 +72,19 @@ nlf:	cmpi r6 0xa00		;prend en cpte l'arrivee
 	leti r6 0
 	add2i r3 0x5000
 	setctr a0 r3
-ecr:	call prchr
+	
+ecr:	push r7
+	call prchr
+	pop r7
 	add2i r6 0x80
 	jump wh
-out:	jump out
-	
+
+out:	pop r6
+	pop r5
+	pop r4
+	pop r3
+	pop r2
+	return
 	
 prchr:	;; va ecrire le code ascii de r2
 	;; couleur r0 fond r1
@@ -91,3 +125,6 @@ fi:
 
 	setctr a1 r5
 	return
+
+#include div.s
+#endmain
