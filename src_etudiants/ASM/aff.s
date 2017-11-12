@@ -38,7 +38,7 @@ write:	push r2
 	sub2i r0 0x10000
 	leti r1 160
 	push r7
-	call div
+	call div.s$div
 	pop r7
 	let r6 r0
 	

@@ -22,7 +22,7 @@ apos:	sub3 r4 r5 r1
 	xor3i r3 r3 1
 
 bpos:	push r7
-	call mult
+	call mult.s$mult
 	pop r7
 	cmpi r3 0
 	jumpif z cpos
