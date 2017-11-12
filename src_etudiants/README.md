@@ -22,3 +22,5 @@
   * `div.s` pour la division
   * `mults.s` pour la multiplication signée
   * `mult16.s` pour la multiplication 16 bits
+
+  pour essayer ces codes : entrer dans le fichier, modifier les deux premières lignes avec leti r0 ... et leti r1 ...
