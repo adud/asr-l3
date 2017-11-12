@@ -50,11 +50,12 @@ int main(int argc, char* argv[]) {
 	bool graphical_output = cmdOptionExists(argv, argv+argc, "-g");
  
 	std::string filename = argv[argc-1];
-	std::ifstream f(filename.c_str());
+	/*std::ifstream f(filename.c_str());
 	if(!f.good()) {
 		std::cerr << "can't access obj file" << std::endl;
 		usage();
-	}
+		}*/
+	
 	Memory* m;
 	Processor* p;
 	std::thread* screen;
@@ -62,7 +63,10 @@ int main(int argc, char* argv[]) {
 	m= new Memory();
 	p = new Processor(m);
 
-	m->fill_with_obj_file(filename);
+	if(m->fill_with_obj_file(filename)){
+		std::cerr << "can't access obj file" << std::endl;
+		usage();
+	}
 
 
 	
@@ -76,21 +80,26 @@ int main(int argc, char* argv[]) {
 
 	if(cmdOptionExists(argv,argv+argc, "-m")){
 		//change filename extension
-		std::string chemin = filename.substr(0,1+filename.find_last_of("/"));
-		//std::cout << chemin;
-		std::string a2mn = filename.substr(0,filename.find_last_of(".")) + ".mem";
-		//thx sof
-		
-		std::ifstream a2mf(a2mn.c_str());
+		std::string memname = getCmdOption(argv,argv+argc, "-m");
+		int tranche = 1+memname.find_last_of("/");
+		std::string chemin = memname.substr(0,tranche);
 		std::string nomf;
 		uword pos;
-		while(a2mf >> std::hex >> pos >> nomf)
-		{ 
-			std::cerr << nomf << " in 0x" << std::hex
-				  << pos << " : ";
-			m->fill_with_obj_file(chemin+nomf,pos);
-		}
-		a2mf.close();
+		//std::cout << chemin;
+		//thx sof
+		
+		std::ifstream a2mf(memname.c_str());
+		if(a2mf){
+			while(a2mf >> std::hex >> pos >> nomf)
+			{ 
+				std::cerr << nomf << " in 0x" << std::hex
+					  << pos << " : ";
+				if(m->fill_with_obj_file(chemin+nomf,pos))
+					exit(1);
+			}
+			a2mf.close();
+		} else 
+			std::cerr << "can't access memory file" << std::endl;
 	}
 	
 

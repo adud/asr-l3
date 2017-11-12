@@ -1,7 +1,7 @@
 # Premier rendu #
 
 ## Le simulateur ##
-
+  * peut charger des fichiers en mémoire à l'aide de `-m file.mem` où `file.mem` est sur chaque ligne : <addresse hexa> <fichier à ajouter à cette addresse>
   * ajout d'un drapeau de dépassement de capacité sur entiers signés (*flag V(oVerflow)*)
   *  débogueur *pimpé* :
   

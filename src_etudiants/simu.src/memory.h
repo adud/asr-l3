@@ -30,8 +30,9 @@ class Memory {
 	/** ctr should be one of PC, SP, A0, A1 */
 	void set_counter(int ctr, uword val);
 
-	/** method called to initialize the memory */
-	void fill_with_obj_file(std::string filename,uint64_t pos=0);
+	/** method called to initialize the memory 
+	 0 : all right; 1: can't open file*/
+	int fill_with_obj_file(std::string filename,uint64_t pos=0);
 
 	Memory();
 	~Memory();
