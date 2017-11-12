@@ -41,12 +41,12 @@ void Memory::fill_with_obj_file(std::string filename,uint64_t pos) {
 	std::fstream fin(filename, std::fstream::in);
 	char c;
 	while (fin >> c) {
-		if (c=='0') {	
-			std::cerr << c;
+		if (c=='0') {
+			//std::cerr << c;
 			write_bit(0, 0);
 		}
-		if (c=='1'){	
-			std::cerr << c;
+		if (c=='1'){
+			//std::cerr << c;
 			write_bit(0, 1);
 		} 
 		// all the other characters are skipped
