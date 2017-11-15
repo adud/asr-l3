@@ -31,6 +31,13 @@ class Processor {
 	//incremente le counter *du proc* en argument
 	void set_count(int counter,uword offset);
 	//met a offset le counter *du proc* en argument
+	int read_bit_proc(int ctr, bool code);
+	//appelle read_bit de la memoire, et incremente les
+	//compteurs de lecture
+	//si code vaut 1, les bits lus sont consideres comme du
+	//code et non-ajoutes a rbitsprgctr
+	void write_bit_proc(int ctr, int bit);
+	//idem 
 	Memory *m;
 	uword pc;
 	uword sp;
@@ -45,11 +52,26 @@ class Processor {
 	bool cflag;
 	bool nflag;
 	bool vflag; //ajout pour maxint >s minint (ce serait bien)
+
+	//for the stats output
+	unsigned int opctr[40]; //compte le nb d'appels a chq op
+	unsigned int instr_bits_ctr;//compte le nb de bits d'instr
+
+	unsigned int rbitsctr;//compte le nb de bits lus
+	unsigned int rbitsmemctr;//compte le nb de bits lus, en
+	//dehors de ceux par le programme
+	unsigned int wbitsctr;//compte le nombre de bits ecrits
+
+	
 };
 
 int sizeval(int size);//la table 2 size
 bool sum_overflow(uword,uword,uword);
 bool diff_overflow(uword,uword,uword);
 //calcul du flag d'overflow (drapeau de depassement en comp a 2)
-char* codename(int opcode);
+int opflat(int opcode);
+//aplatit les opcodes : donne leur no dans la table de l'isa
+//sauf readsze qui ont ete deplaces apres
+
+char* opname(int opcode);
 //retourne une chaine contenant le nom de l'operation de no opcode

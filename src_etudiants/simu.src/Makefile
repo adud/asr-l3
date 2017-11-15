@@ -1,4 +1,4 @@
-CFLAGS = -Wall -O2 -std=c++11
+CFLAGS = -Wall -Wextra -O2 -std=c++11
 LDFLAGS = -lSDL2 -lpthread 
 EXEC = simu
 SRC = $(wildcard *.cpp)
