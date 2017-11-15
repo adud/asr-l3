@@ -35,7 +35,7 @@ bool cmdOptionExists(char** begin, char** end, const std::string& option) {
 }
 
 void usage() {
-		std::cerr << "Usage: simu [options] file.obj \n options : -d for debug, -s for step by step, -g for graphical screen, -m <file> to include a memory file" << std::endl;
+		std::cerr << "Usage: simu [options] file.obj \n options : -d for debug, -s for step by step, -g for graphical screen, -m <file> to include a memory file, --stats for running stats" << std::endl;
 		exit(0);
 }
 
@@ -139,6 +139,9 @@ int main(int argc, char* argv[]) {
 			
 		}
 	};
+
+	if(cmdOptionExists(argv,argv+argc,"--stats"))
+		p->printctrs();
 
 	if(graphical_output)
 		screen->join();

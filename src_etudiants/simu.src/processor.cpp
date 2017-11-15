@@ -1,6 +1,11 @@
 #include "processor.h"
 using namespace std;
 
+char t[39][7] = {"add2","add2i","sub2","sub2i","cmp","cmpi","let","leti","shift","tsnh","jump","jumpif","readze","readse",
+		 "or2","or2i","and2","and2i","write","call","setctr","getctr","push","return","add3","add3i","sub3","sub3i",
+		 "and3","and3i","or3","or3i","xor3","xor3i","asr3","?","?","?","???"};
+
+
 Processor::Processor(Memory* m): m(m) {
 	pc=0;
 	sp=0;
@@ -8,10 +13,13 @@ Processor::Processor(Memory* m): m(m) {
 	a2=0;
 	for (int i=0; i<7; i++)
 		r[i]=0;
+	resetctrs();
 }
 
 Processor::~Processor()
-{}
+{
+  delete m;
+}
 
 
 int Processor::von_Neuman_step(bool debug) {
@@ -262,7 +270,7 @@ int Processor::von_Neuman_step(bool debug) {
 			uop1 = r[regnum1];
 			for(int i=size-1;i>=0;i--)
 			{
-				m->write_bit(counter,1 & (uop1>>i));
+				write_bit_proc(counter,1 & (uop1>>i));
 				incr_count(counter);
 			}
 			//end sabote
@@ -306,7 +314,7 @@ int Processor::von_Neuman_step(bool debug) {
    			sp -= WORDSIZE;
 			m->set_counter(SP,sp);
 			for(int i=WORDSIZE-1;i>=0;i--)
-				m->write_bit(SP,(uop1>>i)&1);
+				write_bit_proc(SP,(uop1>>i)&1);
 			m->set_counter(SP,sp);
 			manage_flags = false;
 			break;
@@ -500,6 +508,8 @@ int Processor::von_Neuman_step(bool debug) {
 			return -1;
 		}
 	}
+	opctr[opflat(opcode)]++;
+	instr_bits_ctr+=opsize(opcode);
 	return opcode;
 }
 
@@ -545,7 +555,7 @@ void Processor::read_const_from_pc(uint64_t& var,bool sex) {
 		var = (var<<1) + read_bit_proc(PC,true);
 		pc++;
 	}		
-
+	
 	if(sex){
 	  int sign=(var >> (size-1)) & 1;
 	  for (int i=size; i<WORDSIZE; i++)
@@ -696,6 +706,36 @@ void Processor::write_bit_proc(int ctr, int bit)
 	return;
 }
 
+void Processor::resetctrs()
+{
+	for(int i=0;i<40;i++)
+		opctr[i] = 0;
+	instr_bits_ctr = rbitsctr =
+		rbitsmemctr = wbitsctr = 0;
+	return;
+}
+
+void Processor::printctrs()
+{
+	
+	unsigned int sum(0);
+	cout << "stats :\n\n";
+	for(int i=0;i<40;sum += opctr[i++]){}
+	cout << sum << " operations :\n\n";
+	for(int i=0;i<39;i++)
+		if(opctr[i])
+			cout << "\t" << t[i] << "\t" << opctr[i]
+			     << "\t" << opctr[i]*100./sum << "%\n";
+	cout << endl;
+	cout << "memory interaction :\n";
+	cout << "read : " << rbitsctr << endl;
+	cout << "(exp): " << rbitsmemctr << endl;
+
+	cout << "write: " << wbitsctr << endl;
+	
+				       
+}
+		
 
 int sizeval(int size){
 	switch(size){
@@ -718,15 +758,12 @@ bool diff_overflow(uword uop1, uword uop2, uword ur)
 {
 	return sum_overflow(ur,uop2,uop1);
 }
-
+/*
 char t0[12][7] = {"add2","add2i","sub2","sub2i","cmp","cmpi","let","leti","shift","tsnh","jump","jumpif"};
 char t9[2][7] = {"readze","readse"};
 char t6[8][7] = {"or2","or2i","and2","and2i","write","call","setctr","getctr"};
 char t7[16][7] = {"push","return","add3","add3i","sub3","sub3i","and3","and3i","or3","or3i","xor3","xor3i","asr3","?","?","?"};
-
-char t[39][7] = {"add2","add2i","sub2","sub2i","cmp","cmpi","let","leti","shift","tsnh","jump","jumpif","readze","readse",
-	      "or2","or2i","and2","and2i","write","call","setctr","getctr","push","return","add3","add3i","sub3","sub3i",
-	      "and3","and3i","or3","or3i","xor3","xor3i","asr3","?","?","?"};
+*/
 
 int opflat(const int opcode)
 {
@@ -737,6 +774,17 @@ int opflat(const int opcode)
 	case 7: return (opcode&15)+22;//t7[opcode&15];
 	}
 	return -1;
+}
+
+int opsize(const int opcode)
+{
+	switch(opcode>>4){
+	case 0:return 4;
+	case 1:return 5;
+	case 3:return 7;
+	case 7:return 11;
+	}
+	return 0;
 }
 
 char* opname(const int opcode)

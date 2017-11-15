@@ -5,7 +5,9 @@ class Processor {
 	Processor(Memory* m);
 	~Processor();
 	int von_Neuman_step(bool debug);
-
+	void resetctrs();
+	//remet les compteurs a zero
+	void printctrs();
  private:
 	void read_bit_from_pc(int& var);
 	//ajoute en fin de var le bit lu
@@ -37,7 +39,8 @@ class Processor {
 	//si code vaut 1, les bits lus sont consideres comme du
 	//code et non-ajoutes a rbitsprgctr
 	void write_bit_proc(int ctr, int bit);
-	//idem 
+	//idem
+		
 	Memory *m;
 	uword pc;
 	uword sp;
@@ -62,7 +65,6 @@ class Processor {
 	//dehors de ceux par le programme
 	unsigned int wbitsctr;//compte le nombre de bits ecrits
 
-	
 };
 
 int sizeval(int size);//la table 2 size
@@ -72,6 +74,7 @@ bool diff_overflow(uword,uword,uword);
 int opflat(int opcode);
 //aplatit les opcodes : donne leur no dans la table de l'isa
 //sauf readsze qui ont ete deplaces apres
-
+int opsize(int opcode);
+//retourne la taille de l'opcode
 char* opname(int opcode);
 //retourne une chaine contenant le nom de l'operation de no opcode

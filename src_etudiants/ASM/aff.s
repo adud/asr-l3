@@ -1,24 +1,24 @@
-	;; leti r0 0x68000
-	;; setctr a1 r0
-	;; leti r0 0x10000
-	;; setctr a0 r0
-	;; setctr sp r0		;initstack
-	
-
-	;; leti r0 0b0000000000000000
-	;; leti r1 0b0000000000111110
-	
-	;; call write
-
+	leti r0 0x68000		
+	setctr a1 r0
 	leti r0 0x10000
-	setctr sp r0
+	setctr a0 r0
+	setctr sp r0		;initstack
+		
+	
+	leti r0 0b0000000000000000
+	leti r1 0b0000000000111110
 
-	leti r0 -1
-	leti r1 0
-	leti r2 0
-	leti r3 47
+	call write
 
-	call putchar
+	;; leti r0 10000
+	;; setctr sp r0
+	
+	;; leti r0 -1
+	;; leti r1 0
+	;; leti r2 0
+	;; leti r3 47
+	
+	;; call putchar
 
 loop:	jump loop
 	
