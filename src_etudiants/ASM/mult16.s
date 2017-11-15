@@ -1,6 +1,9 @@
 	;; Multiplication 32 bits
 	;; si avant appel r0=A,r1=B, A*B <2**32
 	;; apres appel r2*2**16 + r3 = A*B
+	leti r0 10000
+	setctr sp r0		;stinit
+	
 	leti r0 0x0fff
 	leti r1 0x1001
 	call mult16

@@ -1,6 +1,8 @@
 	;;Division
 	;; si r0=A, r1=B A,B < 2**30
 	;; apres div: r2=A//B r0=A%B
+	let r0 10000		;stinit
+	setctr sp r0
 	
 	leti r0 19886
 	leti r1 212

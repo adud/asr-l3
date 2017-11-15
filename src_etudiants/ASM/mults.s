@@ -1,6 +1,9 @@
 	;; Multiplication signee
 	;; si A=r0 B=r1 entiers relatifs
 	;; apres appel, r2=A*B
+	leti r0 0x10000
+	setctr sp r0		;stinit
+	
 	leti r0 -6
 	leti r1	-7
 	leti r5 0
