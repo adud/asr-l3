@@ -35,7 +35,7 @@ bool cmdOptionExists(char** begin, char** end, const std::string& option) {
 }
 
 void usage() {
-		std::cerr << "Usage: simu [options] file.obj \n options : -d for debug, -s for step by step, -g for graphical screen" << std::endl;
+		std::cerr << "Usage: simu [options] file.obj \n options : -d for debug, -s for step by step, -g for graphical screen, -m <file> to include a memory file" << std::endl;
 		exit(0);
 }
 
@@ -115,6 +115,8 @@ int main(int argc, char* argv[]) {
 	// The von Neuman cycle
 	while(1+1==2) {
 		lastopc = p->von_Neuman_step(debug&&ppl);
+		if(lastopc==-1)
+			break;
 		if(step_by_step){
 			if(ppl){
 				

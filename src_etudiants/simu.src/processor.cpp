@@ -490,6 +490,15 @@ int Processor::von_Neuman_step(bool debug) {
 			cout << " r"<< dec << i << "=" << hex << setw(8) << setfill('0') << r[i];
 		cout << endl;
 	}
+	if((int)pc==instr_pc){
+		if(opcode==0xa){//boucle infinie terminale
+			cout << "end detected\n";
+			return -1;
+		} else if(opcode==0b1110001){//return invalide
+			cout << "r7 may be erased at " << pc << endl;
+			return -1;
+		}
+	}
 	return opcode;
 }
 
@@ -535,7 +544,7 @@ void Processor::read_const_from_pc(uint64_t& var,bool sex) {
 		pc++;
 	}		
 
-	if(sex&&(size!=1)){
+	if(sex){
 	  int sign=(var >> (size-1)) & 1;
 	  for (int i=size; i<WORDSIZE; i++)
 	    var += sign << i;

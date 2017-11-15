@@ -149,7 +149,9 @@ putchar:
 	let r1 r0
 	leti r0 0
 	let r2 r3
+	push r7
 	call prchr
+	pop r7
 	return
 #include div.s
 #endmain
