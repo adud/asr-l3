@@ -35,23 +35,30 @@ void Memory::set_counter(int ctr, uword val){
 	counter[ctr]=val;
 }
 
-void Memory::fill_with_obj_file(std::string filename,uint64_t pos) {
+int Memory::fill_with_obj_file(std::string filename,uint64_t pos) {
 	std::cerr << "loading... " ;
 	counter[0] = pos; // this is pc
 	std::fstream fin(filename, std::fstream::in);
 	char c;
-	while (fin >> c) {
-		if (c=='0') {
-			//std::cerr << c;
-			write_bit(0, 0);
+	if(fin){
+		while (fin >> c) {
+			if (c=='0') {
+				//std::cerr << c;
+				write_bit(0, 0);
+			}
+			if (c=='1'){
+				//std::cerr << c;
+				write_bit(0, 1);
+			} 
+			// all the other characters are skipped
 		}
-		if (c=='1'){
-			//std::cerr << c;
-			write_bit(0, 1);
-		} 
-		// all the other characters are skipped
+		fin.close();
+		std::cerr << " done" << std::endl;
+		counter[0] = 0; // this is pc
+		return 0;
+	} else {
+		std::cerr << " error : can't open file"<< std::endl;
+		return 1;
 	}
-	std::cerr << " done" << std::endl;
-  counter[0] = 0; // this is pc
 }
 
