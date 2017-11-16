@@ -277,7 +277,7 @@ def preprocess(lines, baselabel=""):
     """Apply the preprocesor operations to a list of lines.
     baselabel is the string that is added before every label."""
     # we assume that the user use neither ';' nor whitespace characters in
-    include_expr = re.compile("^#include (?P<i_file>([^;]|\S)+)\s*($|;)")
+    include_expr = re.compile("^#include\s+(?P<i_file>[^;\s]+)\s*($|;)")
     main_expr = re.compile("^#main\s*($|;)")
     endmain_expr = re.compile("^#endmain\s*($|;)")
         
