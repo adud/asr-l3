@@ -36,7 +36,14 @@ begin
      wait for 10 ns;  
      x <= "11111111"; 
      y <= "00000001"; 
-     wait for 10 ns;  
+     wait for 10 ns;
+     x <= "00011111";
+     y <= "00001011";
+     wait for 10 ns;
+     x <= "01010101";
+     y <= "01101101";
+     wait for 10 ns;
+     
      -- add more tests here
    end process;
 

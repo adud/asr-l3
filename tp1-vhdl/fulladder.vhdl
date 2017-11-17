@@ -13,6 +13,6 @@ end entity;
 
 architecture rtl of fulladder is
 begin
-  cout <= (x and y) or (x and cin) or (y and cin) ;
-  sum <= (x xor y) xor cin;
+  cout <= (x and y) or (x and cin) or (y and cin) after 50 ps ;
+  sum <= (x xor y) xor cin after 30 ps;
 end architecture;
