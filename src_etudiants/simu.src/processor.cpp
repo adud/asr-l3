@@ -147,7 +147,7 @@ int Processor::von_Neuman_step(bool debug) {
 		r[regnum1] = ur;
 		zflag = (ur==0);
 		// no change to nflag ????
-		nflag = (sword) ur < 0
+		nflag = (sword) ur < 0;
 		vflag = false;
 		manage_flags=false;		
 		break;

@@ -1,4 +1,4 @@
-	leti r0 0x68000		
+	leti r0 0x62000		
 	setctr a1 r0
 	leti r0 0x10000
 	setctr a0 r0
