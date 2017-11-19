@@ -56,7 +56,7 @@ def asm_addr_signed(s, iteration, instruction):
     # Is it a label or a constant? 
     if (s[0]>='0' and s[0]<='9') or s[0]=='-' or s[0]=='+' or s[0:2] == "0x" \
        or s[0:3] == "-0x":
-        val=int(s) # TODO  catch exception here
+        val=int(s,0) # TODO  catch exception here
         # The following is not very elegant but easy to trust
         if val>=-128 and val<= 127:
             return '0 ' + binary_repr(val, 8)
