@@ -147,6 +147,7 @@ int Processor::von_Neuman_step(bool debug) {
 		r[regnum1] = ur;
 		zflag = (ur==0);
 		// no change to nflag ????
+		nflag = (sword) ur < 0;
 		vflag = false;
 		manage_flags=false;		
 		break;
@@ -223,7 +224,7 @@ int Processor::von_Neuman_step(bool debug) {
 
 		case 0b110001://or2i
 			read_reg_from_pc(regnum1);
-			read_const_from_pc(constop,true);
+			read_const_from_pc(constop,false);
 			uop1 = r[regnum1];
 			uop2 = constop;
 			ur = uop1|uop2;
@@ -245,7 +246,7 @@ int Processor::von_Neuman_step(bool debug) {
 
 		case 0b110011://and2i
 			read_reg_from_pc(regnum1);
-			read_const_from_pc(constop,true);
+			read_const_from_pc(constop,false);
 			uop1 = r[regnum1];
 			uop2 = constop;
 			ur = uop1&uop2;
@@ -387,7 +388,7 @@ int Processor::von_Neuman_step(bool debug) {
 		case 0b1110111://and3i
 			read_reg_from_pc(regnum1);
 			read_reg_from_pc(regnum2);
-			read_const_from_pc(constop,true);
+			read_const_from_pc(constop,false);
 			uop1 = r[regnum2];
 			uop2 = constop;
 			ur = uop1&uop2;
@@ -420,7 +421,7 @@ int Processor::von_Neuman_step(bool debug) {
 		case 0b1111001://or3i
 			read_reg_from_pc(regnum1);
 			read_reg_from_pc(regnum2);
-			read_const_from_pc(constop,true);
+			read_const_from_pc(constop,false);
 			uop1 = r[regnum2];
 			uop2 = constop;
 			ur = uop1|uop2;
@@ -444,7 +445,7 @@ int Processor::von_Neuman_step(bool debug) {
 		case 0b1111011://xor3i
 			read_reg_from_pc(regnum1);
 			read_reg_from_pc(regnum2);
-			read_const_from_pc(constop,true);
+			read_const_from_pc(constop,false);
 			uop1 = r[regnum2];
 			uop2 = constop;
 			ur = uop1^uop2;
@@ -640,7 +641,7 @@ bool Processor::cond_true(int cond) {
 	case 6 :
 		return cflag;
 	case 7 :
-		return zflag || cflag;
+		return vflag;
 		
 // end sabote
 		
