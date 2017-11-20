@@ -486,7 +486,7 @@ int Processor::von_Neuman_step(bool debug) {
 	  cout << "after instr: " << opname(opcode) 
 	       << " at pc=" << hex << setw(8) << setfill('0') << instr_pc
 	       << " (newpc=" << hex << setw(8) << setfill('0') << pc << ")" <<  endl;
-	  cout << " zcnv = " << (zflag?1:0) << (cflag?1:0) << (nflag?1:0) << (vflag?1:0) << endl;
+	  cout << " zncv = " << (zflag?1:0) << (nflag?1:0) << (cflag?1:0) << (vflag?1:0) << endl;
 	  cout << " pc=" << hex << setw(8) << setfill('0') << m->counter[0] 
 				 << " sp=" << hex << setw(8) << setfill('0') << m->counter[1] 
 				 << " a0=" << hex << setw(8) << setfill('0') << m->counter[2] 
