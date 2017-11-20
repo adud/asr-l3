@@ -483,21 +483,22 @@ int Processor::von_Neuman_step(bool debug) {
 	}
 
 	if (debug) {
+	  int ws = WORDSIZE/4;
 	  cout << "after instr: " << opname(opcode) 
-	       << " at pc=" << hex << setw(8) << setfill('0') << instr_pc
-	       << " (newpc=" << hex << setw(8) << setfill('0') << pc << ")" <<  endl;
+	       << " at pc=" << hex << setw(ws) << setfill('0') << instr_pc
+	       << " (newpc=" << hex << setw(ws) << setfill('0') << pc << ")" <<  endl;
 	  cout << " zncv = " << (zflag?1:0) << (nflag?1:0) << (cflag?1:0) << (vflag?1:0) << endl;
-	  cout << " pc=" << hex << setw(8) << setfill('0') << m->counter[0] 
-				 << " sp=" << hex << setw(8) << setfill('0') << m->counter[1] 
-				 << " a0=" << hex << setw(8) << setfill('0') << m->counter[2] 
-	       << " a1=" << hex << setw(8) << setfill('0') << m->counter[3] << endl ;
+	  cout << " pc=" << hex << setw(ws) << setfill('0') << m->counter[0] 
+				 << " sp=" << hex << setw(ws) << setfill('0') << m->counter[1] 
+				 << " a0=" << hex << setw(ws) << setfill('0') << m->counter[2] 
+	       << " a1=" << hex << setw(ws) << setfill('0') << m->counter[3] << endl ;
 			//				 << " newpc=" << hex << setw(9) << setfill('0') << pc;
 	  
 		for (int i=0; i<4; i++)
-			cout << " r"<< dec << i << "=" << hex << setw(8) << setfill('0') << r[i];
+			cout << " r"<< dec << i << "=" << hex << setw(ws) << setfill('0') << r[i];
 		cout << endl;
 		for (int i=4;i<8;i++)
-			cout << " r"<< dec << i << "=" << hex << setw(8) << setfill('0') << r[i];
+			cout << " r"<< dec << i << "=" << hex << setw(ws) << setfill('0') << r[i];
 		cout << endl;
 	}
 	if((int)pc==instr_pc){
@@ -558,9 +559,13 @@ void Processor::read_const_from_pc(uint64_t& var,bool sex) {
 	}		
 	
 	if(sex){
-	  int sign=(var >> (size-1)) & 1;
-	  for (int i=size; i<WORDSIZE; i++)
-	    var += sign << i;
+		if((var >> (size-1)) & 1)
+		{
+			for (int i=size; i<WORDSIZE; i++)
+			{
+				var += ((uword) 1 << i);
+			}
+		}
 	}
 }
 

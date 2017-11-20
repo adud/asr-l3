@@ -61,7 +61,6 @@
 	leti	r3 0x7fffffffffffffff
 	cmp	r2 r3
 	; CHECK zero clear, negative clear, carry clear, overflow set
-	;; HERE ERROR ANT 20/11/17
 ; shift
 	leti	r0 3
 	shift	left r0 61
