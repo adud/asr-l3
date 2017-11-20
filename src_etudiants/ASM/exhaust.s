@@ -61,7 +61,6 @@
 	leti	r3 0x7fffffffffffffff
 	cmp	r2 r3
 	; CHECK zero clear, negative clear, carry clear, overflow set
-
 ; shift
 	leti	r0 3
 	shift	left r0 61

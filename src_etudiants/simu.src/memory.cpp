@@ -1,6 +1,9 @@
 #include "memory.h"
 
-Memory::Memory(){}
+Memory::Memory():counter{0}
+{
+	counter[SP] = 0x10000; //par defaut pile juste avant l'ecran
+}
 Memory::~Memory(){}
 
 

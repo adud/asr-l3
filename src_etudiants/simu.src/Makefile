@@ -14,10 +14,11 @@ main.o: main.cpp  screen.h memory.h processor.h types.h
 	$(CXX) $(CFLAGS) -o $@ -c $<
 processor.o: processor.cpp processor.h types.h
 	$(CXX) $(CFLAGS) -o $@ -c $<
-memory.o: memory.cpp
+memory.o: memory.cpp types.h
 	$(CXX) $(CFLAGS) -o $@ -c $<
 screen.o: screen.cpp screen.h memory.h types.h
 	$(CXX) $(CFLAGS) -o $@ -c $<
+
 
 #%.o : %.cpp
 #	$(CXX) $(CFLAGS) -o $@ -c $<
