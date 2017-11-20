@@ -4,9 +4,12 @@
 //constants about the environnement
 const int WIDTH = 160;
 const int HEIGHT = 128;
-const int MEM_SCREEN_BEGIN = 0x10000;
+const int MEM_SCREEN_BEGIN = 0x10000;// -> 0x60000
+//de la place pour un aff ascii 0x60000 -> 0x62000
+const int MEM_KBD_BEGIN = 0x10000; 
 
 #include <SDL2/SDL.h>
+#include <stdio.h>
 #include "memory.h"
 
 /* this is the function that runs in the screen thread
