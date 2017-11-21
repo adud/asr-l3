@@ -14,7 +14,7 @@ void simulate_screen(Memory* m,  bool* refresh) {
 	/*temp buffer*/
 	uint32_t tempscreen[WIDTH * HEIGHT];
 	
-	const Uint8 *state = SDL_GetKeyboardState(NULL);
+	volatile const Uint8 *state = SDL_GetKeyboardState(NULL);
 	uint64_t word_addr;
 	int bit=0;
 	int mempos=0;
