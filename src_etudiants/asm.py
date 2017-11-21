@@ -56,7 +56,7 @@ def asm_addr_signed(s, iteration, instruction):
     # Is it a label or a constant? 
     if (s[0]>='0' and s[0]<='9') or s[0]=='-' or s[0]=='+' or s[0:2] == "0x" \
        or s[0:3] == "-0x":
-        val=int(s) # TODO  catch exception here
+        val=int(s,0) # TODO  catch exception here
         # The following is not very elegant but easy to trust
         if val>=-128 and val<= 127:
             return '0 ' + binary_repr(val, 8)
@@ -404,11 +404,11 @@ def asm_pass(iteration, lines):
             if opcode == "or2" and token_count==3:
                 instruction_encoding = "110000 " + asm_reg(tokens[1]) + asm_reg(tokens[2])
             if opcode == "or2i" and token_count==3:
-                instruction_encoding = "110001 " + asm_reg(tokens[1]) + asm_const_signed(tokens[2])
+                instruction_encoding = "110001 " + asm_reg(tokens[1]) + asm_const_unsigned(tokens[2])
             if opcode == "and2" and token_count==3:
                 instruction_encoding = "110010 " + asm_reg(tokens[1]) + asm_reg(tokens[2])
             if opcode == "and2i" and token_count==3:
-                instruction_encoding = "110011 " + asm_reg(tokens[1]) + asm_const_signed(tokens[2])
+                instruction_encoding = "110011 " + asm_reg(tokens[1]) + asm_const_unsigned(tokens[2])
             if opcode == "write" and token_count == 4:
                 instruction_encoding = "110100 " + asm_counter(tokens[1]) + asm_size(tokens[2]) + \
                                        asm_reg(tokens[3])
@@ -443,20 +443,20 @@ def asm_pass(iteration, lines):
                                        asm_reg(tokens[3])
             if opcode == "and3i" and token_count == 4:
                 instruction_encoding = "1110111 " + asm_reg(tokens[1]) + asm_reg(tokens[2]) + \
-                                       asm_const_signed(tokens[3])
+                                       asm_const_unsigned(tokens[3])
     
             if opcode == "or3" and token_count == 4:
                 instruction_encoding = "1111000 " + asm_reg(tokens[1]) + asm_reg(tokens[2]) + \
                                        asm_reg(tokens[3])
             if opcode == "or3i" and token_count == 4:
                 instruction_encoding = "1111001 " + asm_reg(tokens[1]) + asm_reg(tokens[2]) + \
-                                       asm_const_signed(tokens[3])
+                                       asm_const_unsigned(tokens[3])
             if opcode == "xor3" and token_count == 4:
                 instruction_encoding = "1111010 " + asm_reg(tokens[1]) + asm_reg(tokens[2]) + \
                                        asm_reg(tokens[3])
             if opcode == "xor3i" and token_count == 4:
                 instruction_encoding = "1111011 " + asm_reg(tokens[1]) + asm_reg(tokens[2]) + \
-                                       asm_const_signed(tokens[3])
+                                       asm_const_unsigned(tokens[3])
             if opcode == "asr3" and token_count == 4:
                 instruction_encoding = "1111100 " + asm_reg(tokens[1]) + asm_reg(tokens[2]) + \
                                        asm_shiftval(tokens[3])
