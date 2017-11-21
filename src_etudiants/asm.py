@@ -22,7 +22,15 @@ size_of_address = {}
 # For each jump instruction, maps the line of the instruction to the
 # size of the address operand contained in the instruction.
 
-WORDSIZE = 32 #must be the same in simu.src/types.h
+fich = open("./simu.src/types.h")
+for line in fich:
+    a = re.search("(WORDSIZE) ([0-9]+)",line)
+    if a:
+        WORDSIZE = a.group(2)
+fich.close()
+
+    
+#WORDSIZE must be the same in simu.src/types.h
 nb_iterations = 4
 
 def error(e):

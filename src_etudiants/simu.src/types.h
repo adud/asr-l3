@@ -1,5 +1,7 @@
 #include<inttypes.h>
 
+#define WORDSIZE 64
+
 #if WORDSIZE==32
 typedef uint32_t uword;
 typedef int32_t sword;
