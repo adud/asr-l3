@@ -1,4 +1,5 @@
-CFLAGS = -Wall -Wextra -O2 -std=c++11
+WORDSIZE ?= 32
+CFLAGS = -Wall -Wextra -O2 -std=c++11 -DWORDSIZE=$(WORDSIZE)
 LDFLAGS = -lSDL2 -lpthread 
 EXEC = simu
 SRC = $(wildcard *.cpp)
@@ -27,3 +28,4 @@ clean :
 cleaner : clean
 	@rm $(EXEC)
 
+#sed -i -E 's/(^WORDSIZE\s*=\s*)[0-9]+/\132/' asm.py
