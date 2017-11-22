@@ -28,8 +28,8 @@ $(SIMUOBJ)/%.o: $(SIMUSRC)/%.cpp $(CONFIG)
 	mkdir -p $(SIMUOBJ)
 	$(CXX) $(CFLAGS) -DWORDSIZE=$(WORDSIZE) -MMD -MP -o $@ -c $<
 
-$(ASMOBJ)/%.obj: $(ASMSRC)/%.s
-	python asm.py -a $(WORDSIZE) $<
+$(ASMOBJ)/%.obj: $(ASMSRC)/%.s $(CONFIG)
+	python asm.py -a $(WORDSIZE) -v 1 $<
 	mkdir -p $(ASMOBJ)
 	mv $(ASMSRC)/$*.obj $@
 

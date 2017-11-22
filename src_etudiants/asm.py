@@ -22,10 +22,8 @@ size_of_address = {}
 # For each jump instruction, maps the line of the instruction to the
 # size of the address operand contained in the instruction.
 
-# WORDSIZE = 32 # the value by default
-
-    
-#WORDSIZE must be the same in simu.src/types.h
+verb = 0
+VBMAX = 2
 nb_iterations = 4
 
 def error(e):
@@ -109,7 +107,8 @@ def asm_addr_signed(s, iteration, instruction):
             address = labels[s]
         size = size_of_address[line]
         prefixes = {8:"0 ", 16:"10 ", 32:"110 "}
-        print address
+        if verb >= VBMAX:
+            print address
         return prefixes[size] + binary_repr(address, size)
             
     else:
@@ -330,9 +329,10 @@ def preprocess(lines, baselabel=""):
     for i_file in files_to_include:
         final_lines.extend(include_file(i_file, baselabel))
 
-    print "After the preprocessing operation :"
-    for l in final_lines:
-        print l
+    if verb>=VBMAX:
+        print "After the preprocessing operation :"
+        for l in final_lines:
+            print l
 
     return final_lines
 
@@ -345,11 +345,14 @@ def asm_pass(iteration, lines):
     line = 0
     new_labels = {}
     new_end_of_instr = {}
-    print "\n PASS " + str(iteration)
+    if verb>=1:
+        print "PASS " + str(iteration)
     current_address = 0
     for source_line in lines:
-        instruction_encoding="" 
-        print "processing " + source_line # just to get rid of the final newline
+        instruction_encoding=""
+        if verb >= VBMAX:
+            print "processing " + source_line # just to get rid of the
+            #final newline
 
         # if there is a comment, get rid of it
         index = str.find(source_line, ";")
@@ -473,8 +476,9 @@ def asm_pass(iteration, lines):
                 compact_encoding = ''.join(instruction_encoding.split()) 
                 instr_size = len(compact_encoding)
                 # Debug output
-                print "... @" + str(current_address) + " " + binary_repr(current_address,16) + "  :  " + compact_encoding
-                print  "                          "+  instruction_encoding+ "   size=" + str(instr_size)    
+                if verb >= VBMAX:
+                    print "... @" + str(current_address) + " " + binary_repr(current_address,16) + "  :  " + compact_encoding
+                    print  "                          "+  instruction_encoding+ "   size=" + str(instr_size)    
                 current_address += instr_size
                 if opcode in ("jump", "jumpif"):
                     new_end_of_instr[line] = current_address
@@ -499,9 +503,12 @@ if __name__ == '__main__':
     argparser.add_argument('-a', '--architecture', type=int, choices=(32, 64),
                            default=32, help='Decide wether it is a 32 or a 64 '
                                             'bits architecture. Default is 32')
+    argparser.add_argument('-v', '--verbose', type=int, default=0,
+                           help='verbose output')
     options=argparser.parse_args()
     filename = options.filename
     WORDSIZE = options.architecture
+    verb = options.verbose
     basefilename, extension = os.path.splitext(filename)
     obj_file = basefilename+".obj"
 
@@ -510,13 +517,14 @@ if __name__ == '__main__':
         code = asm_pass(i, lines)
     
     # statistics
-    print "Average instruction size is " + str(1.0*current_address/len(code))
     
     outfile = open(obj_file, "w")
     for instr in code:
         outfile.write(instr)
         outfile.write("\n")
 
-    print "with version ==" + str(WORDSIZE) + "=="
+    if verb >= 1:
+        print "Average instruction size is " + str(1.0*current_address/len(code))
+        print "with version ==" + str(WORDSIZE) + "=="
     outfile.close()
     
