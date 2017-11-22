@@ -517,5 +517,6 @@ if __name__ == '__main__':
         outfile.write(instr)
         outfile.write("\n")
 
-
+    print "with version ==" + str(WORDSIZE) + "=="
     outfile.close()
+    

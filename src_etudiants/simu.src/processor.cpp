@@ -599,8 +599,8 @@ void Processor::read_addr_from_pc(uword& var) {
 	// cerr << "before signext " << var << endl;
 	// sign extension
 	int sign=(var >> (size-1)) & 1;
-	for (int i=size; i<WORDSIZE; i++)
-		var += sign << i;
+	if(sign)
+		var -= (1<<size);
 	// cerr << "after signext " << var << " " << (int)var << endl;
 
 }
