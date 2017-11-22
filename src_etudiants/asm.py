@@ -22,12 +22,7 @@ size_of_address = {}
 # For each jump instruction, maps the line of the instruction to the
 # size of the address operand contained in the instruction.
 
-fich = open("./simu.src/types.h")
-for line in fich:
-    a = re.search("(WORDSIZE) ([0-9]+)",line)
-    if a:
-        WORDSIZE = a.group(2)
-fich.close()
+# WORDSIZE = 32 # the value by default
 
     
 #WORDSIZE must be the same in simu.src/types.h
@@ -497,11 +492,16 @@ def asm_pass(iteration, lines):
 #/* main */
 if __name__ == '__main__':
 
-    argparser = argparse.ArgumentParser(description='This is the assembler for the ASR2017 processor @ ENS-Lyon')
-    argparser.add_argument('filename', help='name of the source file.  "python asm.py toto.s" assembles toto.s into toto.obj')
-
+    argparser = argparse.ArgumentParser(description='This is the assembler '
+                                        'for the ASR2017 processor @ ENS-Lyon')
+    argparser.add_argument('filename', help='name of the source file.  '
+                           '"python asm.py toto.s" assembles toto.s into toto.obj')
+    argparser.add_argument('-a', '--architecture', type=int, choices=(32, 64),
+                           default=32, help='Decide wether it is a 32 or a 64 '
+                                            'bits architecture. Default is 32')
     options=argparser.parse_args()
     filename = options.filename
+    WORDSIZE = options.architecture
     basefilename, extension = os.path.splitext(filename)
     obj_file = basefilename+".obj"
 
