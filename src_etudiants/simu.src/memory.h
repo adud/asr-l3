@@ -17,6 +17,7 @@ const int PC=0;
 const int SP=1;
 const int A0=2;
 const int A1=3;
+const uword spinit(0x10000);
 
 class Memory {
  public:
