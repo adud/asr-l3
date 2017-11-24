@@ -7,6 +7,8 @@
     leti r0 0b111110000000000
     call fill
     leti r0 0b11111
+    leti r2 50
+    leti r4 10
     call draw
     end: jump end
 #main
@@ -116,6 +118,7 @@ fill_iter_raw_exit:
     pop r2
     pop r1
     return
+
 draw:
     ;; r1, r2, r3, r4 contiennent x1, y1, x2, y2
     ;; on cherche à tracer la droite allant de (x1, y1) à (x2, y2)
@@ -127,12 +130,27 @@ draw:
     push r6
     push r7
 
+    cmp r2 r4
+    jumpif gt some_label
+    sub3 r5 r3 r1 ; r5 <- x2 - x1
+    sub3 r6 r4 r2 ; r6 <- y2 - y1
+    cmp r5 r6
+    jumpif ge case1
+    jump case2
+some_label: ; need to find an explicit name...
+    sub3 r5 r3 r1 ; r5 <- x2 - x1
+    sub3 r6 r2 r4 ; r6 <- y1 - y2
+    cmp r5 r6
+    jumpif ge case3
+    jump case4
+
+case1:
     sub3 r5 r3 r1
-    shift left r5 1 ; r5 contient 2 * dy
-    sub3 r6 r1 r3   ; r6 contient -dy
-    sub2 r4 r2      ; r4 contient 2 * dx
+    shift left r5 1 ; r5 contient 2 * dx
+    sub3 r6 r1 r3   ; r6 contient -dx
+    sub2 r4 r2      ; r4 contient 2 * dy
     shift left r4 1
-draw_loop1:
+draw_loop1: ; si y1 ≤ y2 et |y2 - y1| ≤ x2 - x1
     call plot
     ; on incrémente x, et on termine la boucle si x atteint sa valeur max.
     add2i r1 1 
@@ -147,22 +165,28 @@ draw_loop1:
     sub2 r6 r5
     jump draw_loop1
 
-;draw_loop2:
-;    call plot
-;
-;    add2i r1 1 
-;    cmp r1 r3
-;    jumpif gt draw_endloop
+case2:
+case3:
+    sub3 r5 r3 r1
+    shift left r5 1 ; r5 contient 2 * dx
+    sub3 r6 r1 r3   ; r6 contient -dx
+    sub3 r4 r2 r4   ; r4 contient 2 * |dy|
+    shift left r4 1
+draw_loop3: ; si y2 < y1 et |y2 - y1| ≤ x2 - x1
+    call plot
+    ; on incrémente x, et on termine la boucle si x atteint sa valeur max.
+    add2i r1 1 
+    cmp r1 r3
+    jumpif gt draw_endloop
 
-;    add2 r6 r4
-;    cmp r6 r5
-;    jumpif gt draw_loop2
-;    ;; si r6 <= r5, 
-;    sub2i r2 1
-;    add2 r6 r5
-;    add2 r6 r5
-;    jump draw_loop2
+    add2 r6 r4
+    cmpi r6 0
+    jumpif slt draw_loop3
+    sub2i r2 1
+    sub2 r6 r5
+    jump draw_loop3
 
+case4:
 draw_endloop:
     pop r7
     pop r6
