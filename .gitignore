@@ -13,12 +13,11 @@ flipflop/*.pdf
 #le DM
 #src : fichiers de compilation
 src_etudiants/simu
-*.o
-/src_etudiants/ASM/testtt.obj
 
 #plus besoin de conserver les compilations : l'assembleur marche
-*.obj
-#src_etudiants/ASM/test.s
+asm.exec/
+simu.obj
+#./**/test.s
 
 
 *.html
