@@ -1,4 +1,4 @@
-	;; leti r0 0x62000		
+	;; leti r0 0x62080		
 	;; setctr a1 r0
 	;; leti r0 0x10000
 	;; setctr a0 r0
@@ -6,15 +6,15 @@
 		
 	
 	;; leti r0 0b1111100000111110
-	;; call write
+	;; call wrtxt
 
-	leti r0 10000
+	leti r0 0x10000
 	setctr sp r0
 	
 	leti r0 -1
 	leti r1 2
 	leti r2 0
-	leti r3 68
+	leti r3 60
 	
 	call putchar
 	
@@ -32,7 +32,7 @@ loop:	jump loop
 	;; (evite des divisions par 160...)
 
 #main
-write:	push r1
+wrtxt:	push r1
 	push r2
 	push r3
 	push r4
@@ -92,7 +92,7 @@ out:	pop r6
 	pop r2
 	pop r1
 	return
-
+	
 	;; FINAL
 	;;va ecrire le code ascii de r1 en a0
 	;; couleur r0 
@@ -138,6 +138,10 @@ fi:
 	setctr a0 r1
 
 	setctr a1 r4
+	pop r5
+	pop r4
+	pop r3
+	pop r2
 	return
 
 putchar:
