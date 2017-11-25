@@ -1,22 +1,22 @@
-	leti r0 0x62000		
-	setctr a1 r0
-	leti r0 0x10000
-	setctr a0 r0
-	setctr sp r0		;initstack
+	;; leti r0 0x62080		
+	;; setctr a1 r0
+	;; leti r0 0x10000
+	;; setctr a0 r0
+	;; setctr sp r0		;initstack
 		
 	
-	leti r0 0b1111100000111110
-	call write
+	;; leti r0 0b1111100000111110
+	;; call wrtxt
 
-	;; leti r0 10000
-	;; setctr sp r0
+	leti r0 0x10000
+	setctr sp r0
 	
-	;; leti r0 -1
-	;; leti r1 0
-	;; leti r2 0
-	;; leti r3 66
+	leti r0 -1
+	leti r1 2
+	leti r2 0
+	leti r3 60
 	
-	;; call putchar
+	call putchar
 	
 loop:	jump loop
 	
@@ -32,7 +32,7 @@ loop:	jump loop
 	;; (evite des divisions par 160...)
 
 #main
-write:	push r1
+wrtxt:	push r1
 	push r2
 	push r3
 	push r4
@@ -92,11 +92,15 @@ out:	pop r6
 	pop r2
 	pop r1
 	return
-
+	
 	;; FINAL
-	;;va ecrire le code ascii de r1
-	;; couleur r0
-prchr:	getctr a1 r4		
+	;;va ecrire le code ascii de r1 en a0
+	;; couleur r0 
+prchr:	push r2
+	push r3
+	push r4
+	push r5
+	getctr a1 r4		;r4 va juste conserver a1
 	shift left r1 3
 	add2i r1 0x60000
 	setctr a1 r1
@@ -134,9 +138,23 @@ fi:
 	setctr a0 r1
 
 	setctr a1 r4
+	pop r5
+	pop r4
+	pop r3
+	pop r2
 	return
 
 putchar:
+	;; ecrit le caractere dont:
+	;;  - la couleur est r0
+	;;  - les coordonnees sont r1,r2
+	;;  - le code ascii est r3
+	;;
+	push r4
+	getctr a0 r4
+	push r4
+	leti r4 120
+	sub3 r1 r4 r1
 	let r4 r1	;repondre aux spec du prof
 	shift left r4 2
 	add2 r4 r1
@@ -149,6 +167,9 @@ putchar:
 	push r7
 	call prchr
 	pop r7
+	pop r4
+	setctr a0 r4
+	pop r4
 	return
 #include div.s
 #endmain

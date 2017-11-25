@@ -13,7 +13,12 @@ void simulate_screen(Memory* m,  bool* refresh) {
 	bool escape = false;
 	/*temp buffer*/
 	uint32_t tempscreen[WIDTH * HEIGHT];
-
+	
+	volatile const Uint8 *state = SDL_GetKeyboardState(NULL);
+	uint64_t word_addr;
+	int bit=0;
+	int mempos=0;
+	
 	while (!escape) {
 
 		/*deal with events*/
@@ -24,6 +29,22 @@ void simulate_screen(Memory* m,  bool* refresh) {
 				if (e.key.keysym.sym == SDLK_ESCAPE)
 					escape = true;
 			}
+			for(int i=0;i<128;i++){
+			  mempos = MEM_KBD_BEGIN + i;
+			  bit = state[i];
+			  word_addr = mempos>>6;
+			  uint64_t word = m->m[word_addr]; // extract the word where our bit should go
+			  int shift = mempos & 63; // this is a bitwise and -- could have been % 64
+			  
+			  uint64_t bit64 = bit;
+			  bit64 = bit64 << shift;
+			  uint64_t mask = ~(((uint64_t)1) << shift);
+			  word = (word & mask) + bit64;
+			  //std::cerr << std::hex << std::setw(16) <<  m[word_addr] << "  " << word <<std::endl; 
+			  m->m[word_addr] = word;
+			  
+			}
+		      
 		}
 		/* if we need to refresh the screen*/
 		if (true) {

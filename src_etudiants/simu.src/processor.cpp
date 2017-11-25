@@ -8,7 +8,7 @@ char t[39][7] = {"add2","add2i","sub2","sub2i","cmp","cmpi","let","leti","shift"
 
 Processor::Processor(Memory* m): m(m) {
 	pc=0;
-	sp=0;
+	sp=spinit;
 	a1=0;
 	a2=0;
 	for (int i=0; i<7; i++)
