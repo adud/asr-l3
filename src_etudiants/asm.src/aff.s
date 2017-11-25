@@ -19,7 +19,8 @@
 	call putchar
 	
 loop:	jump loop
-	
+
+#main
 	;; Ecrire un texte :
 	;; a0 pointe vers l'ecran (est le crayon)
 	;; a1 pointe vers le début de la chaine de car en memoire
@@ -31,7 +32,6 @@ loop:	jump loop
 	;; r6 contient la pos sur la ligne
 	;; (evite des divisions par 160...)
 
-#main
 wrtxt:	push r1
 	push r2
 	push r3
@@ -92,11 +92,13 @@ out:	pop r6
 	pop r2
 	pop r1
 	return
+
+;;FIN wrtxt
 	
-	;; FINAL
 	;;va ecrire le code ascii de r1 en a0
 	;; couleur r0 
-prchr:	push r2
+prchr:	push r1
+	push r2
 	push r3
 	push r4
 	push r5
@@ -142,24 +144,29 @@ fi:
 	pop r4
 	pop r3
 	pop r2
+	pop r1
 	return
-
+	;;FIN prchr 
+	
 putchar:
 	;; ecrit le caractere dont:
 	;;  - la couleur est r0
 	;;  - les coordonnees sont r1,r2
 	;;  - le code ascii est r3
 	;;
+	push r1
+	push r2
+	push r3
 	push r4
 	getctr a0 r4
 	push r4
 	leti r4 120
-	sub3 r1 r4 r1
-	let r4 r1	;repondre aux spec du prof
+	sub3 r2 r4 r2
+	let r4 r2	;repondre aux spec du prof
 	shift left r4 2
-	add2 r4 r1
-	shift left r4 5
 	add2 r4 r2
+	shift left r4 5
+	add2 r4 r1
 	shift left r4 4
 	add2i r4 0x10000
 	setctr a0 r4
@@ -170,6 +177,11 @@ putchar:
 	pop r4
 	setctr a0 r4
 	pop r4
+	pop r3
+	pop r2
+	pop r1
 	return
+
+	;; FIN putchar
 #include div.s
 #endmain

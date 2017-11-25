@@ -33,9 +33,9 @@ $(ASMOBJ)/%.obj: $(ASMSRC)/%.s $(CONFIG)
 	mkdir -p $(ASMOBJ)
 	mv $(ASMSRC)/$*.obj $@
 
-ktest.obj : aff.obj
-mults.obj : mult.obj
-
+ktest.s : aff.obj
+mults.s : mult.obj
+demo.s : aff.obj graphic.obj
 
 clean :
 	$(RM) $(OFILES) $(DFILES)

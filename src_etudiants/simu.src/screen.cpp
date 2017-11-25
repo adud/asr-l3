@@ -3,6 +3,8 @@
 
 void simulate_screen(Memory* m,  bool* refresh) {
 	/*initialise sdl and create the screen*/
+	refresh = refresh; //to ignore refresh
+	
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_Window *window = SDL_CreateWindow("Asm", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH*2, HEIGHT*2, 0);
 	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
