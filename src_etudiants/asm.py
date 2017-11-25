@@ -181,7 +181,7 @@ def asm_shiftval(s):
 
 def asm_condition(cond):
     """converts the string cond into its encoding in the condition code. """
-    condlist = {"eq":"000", "z":"000",  "neq":"001",  "nz":"001",  "sgt":"010",  "slt":"011",  "gt":"100",  "ge":"101",  "nc":"101",  "lt":"110",  "c":"110",  "v":"111", "le":"111"}
+    condlist = {"eq":"000", "z":"000",  "neq":"001",  "nz":"001",  "sgt":"010",  "slt":"011",  "gt":"100",  "ge":"101",  "nc":"101",  "lt":"110",  "c":"110",  "v":"111"}
     if cond in condlist:
         val = condlist[cond]
         return val + " "
