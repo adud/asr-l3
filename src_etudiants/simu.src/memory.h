@@ -27,6 +27,7 @@ class Memory {
 
 	/** ctr should be one of PC, SP, A0, A1 */
 	void write_bit(int ctr, int bit);
+	void write_bit_raw(uint64_t addr,int bit);
 
 	/** ctr should be one of PC, SP, A0, A1 */
 	void set_counter(int ctr, uword val);

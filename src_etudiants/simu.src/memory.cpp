@@ -16,14 +16,14 @@ int Memory::read_bit(int ctr){
 	return bit;
 }
 
-
-void Memory::write_bit(int ctr, int bit){
+void Memory::write_bit_raw(uint64_t addr, int bit)
+{
 	if(bit!=0 && bit!=1)  {
 		throw "Expecting a bit (0 or 1)";
 	} 
-	uint64_t word_addr = counter[ctr]>>6;
+	uint64_t word_addr = addr >>6;
 	uint64_t word = m[word_addr]; // extract the word where our bit should go
-	int shift = counter[ctr] & 63; // this is a bitwise and -- could have been % 64
+	int shift = addr & 63; // this is a bitwise and -- could have been % 64
 
 	uint64_t bit64 = bit;
 	bit64 = bit64 << shift;
@@ -31,6 +31,11 @@ void Memory::write_bit(int ctr, int bit){
 	word = (word & mask) + bit64;
 	//std::cerr << std::hex << std::setw(16) <<  m[word_addr] << "  " << word <<std::endl; 
 	m[word_addr] = word;
+}
+
+
+void Memory::write_bit(int ctr, int bit){
+	write_bit_raw(counter[ctr],bit);
 	counter[ctr] ++;
 }
 
