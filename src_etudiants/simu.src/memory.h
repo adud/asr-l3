@@ -12,6 +12,16 @@
 
 #include "types.h"
 
+//decrit la position d'objets dans la memoire
+
+const int MEM_SCREEN_BEGIN = 0x10000;// -> 0x60000
+//de la place pour un aff ascii 0x60000 -> 0x62000
+const int MEM_KBD_BEGIN = 0x62000;
+//la reception du clavier 0x62000 -> 0x62080
+const int MEM_CLOCK = 0x62080;
+//l'horloge : 0x62080 -> 0x620c0
+//et on serre les dents pour la compatibilite
+
 const uint64_t MEMSIZE=1<<24; // please keep this a multiple of 64
 const int PC=0;
 const int SP=1;
