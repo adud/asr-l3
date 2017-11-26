@@ -35,7 +35,7 @@ loop:	leti r0 0
 
 	call attact
 	
-	leti r0 0b110000000011111
+	leti r0 0b100110001111111 ; just to have a pinkier pink.
 	leti r1 67
 	leti r2 69
 	leti r3 70
