@@ -225,6 +225,21 @@ def get_lines(filename):
     lines = [l[:-1] for l in lines] # remove the last '\n' characters
     return lines
 
+def get_path(file):
+    global filename
+    
+    if file[0] != "/": # relative file name
+        # we want to get the current directory, so everything after the last
+        # '/' character is removed
+        path_list = filename.split("/")
+        # the 'name' variable replace the last element of 'path'
+        path_list[-1] = file
+        return "/".join(path_list)
+    else:
+        # absolute file name
+        return file
+
+
 def include_file(i_file, baselabel):
     """Load a file, and return the code lines. If two lines '#main' and
     '#endmain' are defined, load only the code between these two lines.
@@ -232,22 +247,12 @@ def include_file(i_file, baselabel):
     The code lines are returned as a list.
 
     i_file : the file to include"""
-    global filename
 
     # the name of the included file is added after the base label, followed by
     # the '$' character. This character is reserved.
     baselabel += i_file + "$"
-    
-    if i_file[0] != "/": # relative file name
-        # we want to get the current directory, so everything after the last
-        # "/" character is removed
-        path = filename.split("/")
-        # the 'name' variable replace the last element of 'path'
-        path.pop()
-        path.append(i_file)
-        i_file = "/".join(path)
 
-    lines = get_lines(i_file)
+    lines = get_lines(get_path(i_file))
     
     main_expr = re.compile("^#main\s*($|;)")
     endmain_expr = re.compile("^#endmain\s*($|;)")
@@ -259,7 +264,7 @@ def include_file(i_file, baselabel):
 
     if main_lines == [] and endmain_lines == []:
         # recursively preprocessing the lines
-        return preprocess(lines, baselabel)
+        return preprocess(lines, baselabel, False, "")
     elif len(main_lines) > 1:
         raise BaseException("Loading error : too much #main directives.")
     elif len(endmain_lines) > 1:
@@ -275,9 +280,9 @@ def include_file(i_file, baselabel):
             raise BaseException("Loading error : #main directive "
                                 "defined after #endmain.")
 
-        return preprocess(lines[main+1:endmain], baselabel)
+        return preprocess(lines[main+1:endmain], baselabel, False, "")
 
-def preprocess(lines, baselabel=""):
+def preprocess(lines, baselabel="", make_dependencies=False, base_obj_file=""):
     """Apply the preprocesor operations to a list of lines.
     baselabel is the string that is added before every label."""
     # we assume that the user use neither ';' nor whitespace characters in
@@ -333,6 +338,12 @@ def preprocess(lines, baselabel=""):
         print "After the preprocessing operation :"
         for l in final_lines:
             print l
+
+    if make_dependencies:
+        with open(base_obj_file + ".d", "w") as f:
+            path_to_include = [get_path(file) for file in files_to_include]
+            f.write(base_obj_file + ".obj" + ": " +
+                    " ".join(path_to_include) + "\n\n")
 
     return final_lines
 
@@ -505,14 +516,26 @@ if __name__ == '__main__':
                                             'bits architecture. Default is 32')
     argparser.add_argument('-v', '--verbose', type=int, default=0,
                            help='verbose output')
+    argparser.add_argument('-MD', '--make_dependencies',
+                           help="generate a file containing dependencies",
+                           action="store_true")
+    argparser.add_argument('-o', '--outfile')
     options=argparser.parse_args()
     filename = options.filename
     WORDSIZE = options.architecture
     verb = options.verbose
-    basefilename, extension = os.path.splitext(filename)
-    obj_file = basefilename+".obj"
+    make_dependencies = options.make_dependencies
+    if options.outfile is None:
+        basefilename, extension = os.path.splitext(filename)
+        obj_file = basefilename+".obj"
+        base_obj_file = basefilename
+    else:
+        base_obj_file, extension = os.path.splitext(options.outfile)
+        obj_file = options.outfile
 
-    lines = preprocess(get_lines(filename))
+    print make_dependencies
+    lines = preprocess(get_lines(filename), "", make_dependencies,
+                       base_obj_file)
     for i in range(1, nb_iterations + 1):
         code = asm_pass(i, lines)
     
