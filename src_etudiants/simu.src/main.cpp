@@ -119,13 +119,18 @@ int main(int argc, char* argv[]) {
 
 	clock_t beg(clock());
 	clock_t act(beg);
+
+	uword time_ms(0);
 	
 	while(1+1==2) {
 		act = clock();
+		act = (uword) (((float)(beg-act))/
+			       (CLOCKS_PER_SEC/1000.));
 		for(int i=63;i>=0;i--){
-			m->write_bit_raw(MEM_CLOCK+i,act&1);
+			m->write_bit_raw(MEM_CLOCK+i,time_ms&1);
 			act >>= 1;
 		}
+		
 		lastopc = p->von_Neuman_step(debug&&ppl);
 		if(lastopc==-1)
 			break;
