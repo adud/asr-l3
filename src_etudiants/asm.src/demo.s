@@ -1,7 +1,7 @@
 	leti r0 0b1110011100111000
 	call graphic.s$clear_screen
 
-	leti r0 0x62080
+	leti r0 0x620c0
 	setctr a1 r0
 
 	leti r0 0x10000
@@ -33,7 +33,10 @@ loop:	leti r0 0
 
 	call graphic.s$fill
 
-	call attact
+	push r0
+	leti r0 250
+	call pause
+	pop r0
 	
 	leti r0 0b110000000011111
 	leti r1 67
@@ -49,13 +52,35 @@ loop:	leti r0 0
 	leti r3 68
 	call aff.s$putchar
 
-	call attact
+	push r0
+	leti r0 200
+	call pause
+	pop r0
 
 	call loop
-	
-attact: leti r5 0x200000
-lpi:	sub2i r5 1
-	jumpif nz lpi
+
+	;;fait une pause de n ms, r0 = n
+pause:	push r1
+	push r2
+	push r3
+	push r4			;sauvegarde a1
+	getctr a1 r4
+	leti r3 0x62080
+	setctr a1 r3
+	readze a1 64 r1		;r1 := debut tps pause
+	setctr a1 r3
+
+lpi:
+	readze a1 64 r2
+	setctr a1 r3
+	sub2 r2 r1
+	cmp r2 r0
+	jumpif slt lpi
+	setctr a1 r4
+	pop r4
+	pop r3
+	pop r2
+	pop r1
 	return
 	
 #include graphic.s

@@ -124,11 +124,11 @@ int main(int argc, char* argv[]) {
 	
 	while(1+1==2) {
 		act = clock();
-		act = (uword) (((float)(beg-act))/
+		time_ms = (uword) (((float)(act-beg))/
 			       (CLOCKS_PER_SEC/1000.));
+		//std::cout << time_ms << std::endl;
 		for(int i=63;i>=0;i--){
-			m->write_bit_raw(MEM_CLOCK+i,time_ms&1);
-			act >>= 1;
+			m->write_bit_raw(MEM_CLOCK+63-i,1&time_ms>>i);
 		}
 		
 		lastopc = p->von_Neuman_step(debug&&ppl);
