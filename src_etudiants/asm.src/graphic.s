@@ -1,5 +1,12 @@
     leti r0 0x10000
     setctr sp r0 ; initialisiation du pointeur de pile
+    
+    leti r0 0b100110001111111
+    leti r1 56
+    leti r2 56
+    leti r3 72
+    leti r4 72
+    call fill
     ; tests : on va tracer une jolie étoile en utilisant plein de couleurs !
     leti r1 63
     leti r2 63
@@ -124,8 +131,8 @@ fill_iter_col_exit:
     jump fill_iter_raw
 
 fill_iter_raw_exit:
-    pop r5
-    setctr a0 r5
+    ; pop r5
+    ; setctr a0 r5
     pop r7
     pop r6
     pop r5
