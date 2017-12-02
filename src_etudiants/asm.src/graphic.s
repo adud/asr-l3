@@ -40,20 +40,28 @@
     end: jump end
 #main
 clear_screen:
-    push r1
-    getctr a0 r1
-    push r1 ; on met le premier élément de la pile en a0, en passant par r1.
-    leti r1 0x10000
+	push r1
+	getctr a0 r1
+	push r1 ; on met le premier élément de la pile en a0, en passant par r1.
+	push r2
+
+	let r2 r0
+	shift left r0 16
+	or2 r0 r2
+	
+	leti r2 0x2800 		;nb de pixels
+	leti r1 0x10000
+	setctr a0 r1
 cls_loop:
-    setctr a0 r1
-    write a0 16 r0
-    add2i r1 16
-    cmpi r1 0x60000
-    jumpif lt cls_loop
-    pop r1 ; on place le premier élément de la pile en a0 en passant par r1.
-    setctr a0 r1
-    pop r1
-    return
+	write a0 32 r0
+	sub2i r2 1
+	jumpif nz cls_loop
+	pop r2
+	pop r1 ; on place le premier élément de la pile en a0 en passant par r1.
+	setctr a0 r1
+	pop r1
+	and2i r0 0xff
+	return
 plot:
     ; r0 contient la couleur du pixel que l'on va afficher
     ; need some comment about r1
