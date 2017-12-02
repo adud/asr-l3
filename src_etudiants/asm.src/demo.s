@@ -24,6 +24,7 @@ flp:	call graphic.s$draw
 	sub2i r5 1
 	jumpif nz flp
 
+	leti r6 10
 loop:	leti r0 0
 	
 	leti r1 60
@@ -57,7 +58,10 @@ loop:	leti r0 0
 	call pause
 	pop r0
 
-	call loop
+	sub2i r6 1
+	jumpif nz loop
+
+fin:	jump fin
 
 	;;fait une pause de n ms, r0 = n
 pause:	push r1

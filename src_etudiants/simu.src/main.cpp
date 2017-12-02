@@ -42,7 +42,7 @@ void usage() {
 
 
 int main(int argc, char* argv[]) {
-	std::cout << "emulator for ==" << WORDSIZE << "== architecture\n";  
+	std::cerr << "emulator for ==" << WORDSIZE << "== architecture\n";  
 	if(argc==1) {
 		usage();
 	}

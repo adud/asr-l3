@@ -503,7 +503,7 @@ int Processor::von_Neuman_step(bool debug) {
 	}
 	if((int)pc==instr_pc){
 		if(opcode==0xa){//boucle infinie terminale
-			cout << "end detected\n";
+			cerr << "end detected\n";
 			return -1;
 		} else if(opcode==0b1110001){//return invalide
 			cout << "r7 may be erased at " << pc << endl;
