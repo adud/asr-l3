@@ -41,8 +41,6 @@
 #main
 clear_screen:
     push r1
-    getctr a0 r1
-    push r1 ; on met le premier élément de la pile en a0, en passant par r1.
     leti r1 0x10000
 cls_loop:
     setctr a0 r1
@@ -51,40 +49,32 @@ cls_loop:
     cmpi r1 0x60000
     jumpif lt cls_loop
     pop r1 ; on place le premier élément de la pile en a0 en passant par r1.
-    setctr a0 r1
-    pop r1
     return
 plot:
     ; r0 contient la couleur du pixel que l'on va afficher
-    ; need some comment about r1
-    ; need some comment about r2
-    push r1
-    push r2
+    ; (r1, r2) contiennent les coordonées du pixel à afficher.
     push r3
-    getctr a0 r3
-    push r3
-    ; need some comment about this operation
+
+    ; r2 <- 127 - r2
     xor3i r2 r2 127
 
-    ; on multiplie r? par 160 et on l'ajoute à r?
+    ; r3 <- 160 * r2 + r1
     let r3 r2
-    shift left r2 2
-    add2 r2 r3
-    shift left r2 5
-    add2 r1 r2
+    shift left r3 2
+    add2 r3 r2
+    shift left r3 5
+    add2 r3 r1
 
-    ; on multiplie r? par 16 et on ajoute 0x10000
-    shift left r1 4
-    add2i r1 0x10000
+    ; on multiplie r2 par 16 et on ajoute 0x10000
+    shift left r3 4
+    add2i r3 0x10000
 
-    ; et on affiche le pixel d'adresse r? :
-    setctr a0 r1
-    write a0 16 r0
-    pop r3
+    ; et on affiche le pixel d'adresse r2 :
     setctr a0 r3
+    write a0 16 r0
+    ; on remet r2 à sa valeur initiale
+    xor3i r2 r2 127 ; on remet r2 à sa valeur initiale
     pop r3
-    pop r2
-    pop r1
     return
 fill:
     push r1
@@ -93,8 +83,6 @@ fill:
     push r5
     push r6
     push r7
-    getctr a0 r5
-    push r5
     let r7 r1
     ; de même que pour plot, on effectue les opérations :
     ; r2 <- 127 - r2
@@ -171,15 +159,14 @@ draw:
 
 no_swap:
     cmp r2 r4
-    jumpif gt some_label
+    jumpif gt y1_gt_y2
     ; si y1 ≤ y2 :
     sub3 r5 r3 r1 ; r5 <- x2 - x1
     sub3 r6 r4 r2 ; r6 <- y2 - y1
     cmp r5 r6
     jumpif ge case1
     jump case2
-some_label: ; need to find an explicit name...
-    ; si y1 > y2
+y1_gt_y2:
     sub3 r5 r3 r1 ; r5 <- x2 - x1
     sub3 r6 r2 r4 ; r6 <- y1 - y2
     cmp r5 r6
@@ -231,7 +218,7 @@ case3:
     sub3 r5 r3 r1
     shift left r5 1 ; r5 contient 2 * dx
     sub3 r6 r1 r3   ; r6 contient -dx
-    sub3 r4 r2 r4   ; r4 contient 2 * |dy|
+    sub2 r4 r2      ; r4 contient 2 * dy
     shift left r4 1
 draw_loop3: ; si y2 < y1 et |y2 - y1| ≤ x2 - x1
     call plot
@@ -240,7 +227,7 @@ draw_loop3: ; si y2 < y1 et |y2 - y1| ≤ x2 - x1
     cmp r1 r3
     jumpif gt draw_endloop
 
-    add2 r6 r4
+    sub2 r6 r4
     cmpi r6 0
     jumpif slt draw_loop3
     sub2i r2 1
