@@ -15,10 +15,13 @@
 //decrit la position d'objets dans la memoire
 
 const int MEM_SCREEN_BEGIN = 0x10000;// -> 0x60000
+const int MEM_SCREEN_END = 0x60000;
 //de la place pour un aff ascii 0x60000 -> 0x62000
 const int MEM_KBD_BEGIN = 0x62000;
+const int MEM_KBD_END = 0x62080;
 //la reception du clavier 0x62000 -> 0x62080
-const int MEM_CLOCK = 0x62080;
+const int MEM_CLOCK_BEGIN = 0x62080;
+const int MEM_CLOCK_END = 0x620c0;
 //l'horloge : 0x62080 -> 0x620c0
 //et on serre les dents pour la compatibilite
 //ca passe de justesse

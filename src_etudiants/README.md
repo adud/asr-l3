@@ -65,6 +65,10 @@ Pour tester le deuxième rendu, après avoir vérifié la valeur de WORDSIZE dan
       cible avec son extension remplacée par `.d`.
     les fichier assembleurs `.s` et `asm.exec` contenant les fichiers objets
     `.obj` et les fichiers de dépendance `.d`.
+## Le simulateur ##
+
+  * Nouvelles options :
+	* `--stats` affiche les statistiques du programme exécuté, à condition que le programme termine (_ie_ qu'il y ait une ligne sautant sur elle-même à un endroit du programme)
 
 ## Compilation ##
   * Désormais, la compilation des fichiers assembleurs est supportée par make.
