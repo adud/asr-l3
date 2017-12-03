@@ -51,7 +51,7 @@ clear_screen:
     leti r1 0x10000
 cls_loop:
     setctr a0 r1
-    write a0 16 r0
+    write a0 16 r0 ; on écrit 64 bits pour mettre à jout 4 pixels d'un coup.
     add2i r1 16
     cmpi r1 0x60000
     jumpif lt cls_loop
