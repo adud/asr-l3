@@ -34,6 +34,9 @@ $(ASMOBJ)/%.obj: $(ASMSRC)/%.s $(CONFIG)
 	mkdir -p $(ASMOBJ)
 	python2 asm.py -a $(WORDSIZE) -MD -v 1 $< -o $@
 
+r2: all
+	./simu -g -m bitmap/grlib.mem asm.exec/demo.obj
+
 clean :
 	$(RM) $(OFILES) $(DFILES) $(OBJFILES) $(ASMDFILES)
 cleaner : clean
