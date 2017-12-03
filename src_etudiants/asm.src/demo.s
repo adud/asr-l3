@@ -3,11 +3,14 @@
 ; Pour corriger, j'ai ajouté des commentaires
 ;     Tout en Alexandrin
 
+#include graphic.s
+#include aff.s
+
 	leti r0 0b1110011100111000
 	call graphic.s$clear_screen ; ainsi fut coloré l'écran d'un bleu profond...
 
 	leti r0 0x620c0
-	setctr a1 r0 ; ainsi fut aligné ce pointeur sur l'horloge...
+	setctr a1 r0 ; ainsi fut aligné ce pointeur sur un texte
 
 	leti r0 0x10000
 	setctr a0 r0 ; tandis que son ami regardait vers l'écran
@@ -40,7 +43,7 @@ loop:	leti r0 0
 	leti r4 78
 
     getctr a0 r6
-	call graphic.s$fill ; Ainsi tout se barra en sucette ici-même.
+	call graphic.s$fill
     setctr a0 r6
 
 	push r0
@@ -93,6 +96,3 @@ lpi:
 	pop r1
 	return
 	
-#include graphic.s
-	
-#include aff.s
