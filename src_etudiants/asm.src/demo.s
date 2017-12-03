@@ -3,16 +3,16 @@
 ; Pour corriger, j'ai ajouté des commentaires
 ;     Tout en Alexandrin
 
-	leti r0 0b1110011100111000
+	leti r0 0b0001110011100111
 	call graphic.s$clear_screen ; ainsi fut coloré l'écran d'un bleu profond...
 
 	leti r0 0x620c0
-	setctr a1 r0 ; ainsi fut aligné ce pointeur sur l'horloge...
+	setctr a1 r0 ; ainsi fut aligné ce pointeur sur les mots...
 
 	leti r0 0x10000
 	setctr a0 r0 ; tandis que son ami regardait vers l'écran
 	
-	call aff.s$wrtxt ; cet écran sur lequel fut affiché un texte
+	call aff.s$wrtxt ; cet écran sur lequel fut affiché le verbe
 	
 	leti r5 20
 	leti r0 -1
@@ -39,17 +39,19 @@ loop:	leti r0 0
 	leti r2 68
 	leti r3 98
 	leti r4 78
-
+	
+	push r6
     getctr a0 r6
 	call graphic.s$fill ; Ainsi tout se barra en sucette ici-même.
     setctr a0 r6
-
+	pop r6
+	
 	push r0
 	leti r0 250
 	call pause
 	pop r0
 	
-	leti r0 0b100110001111111 ; just to have a pinkier pink.
+	leti r0 0b111111100011001 ; just to have a pinkier pink.
 	leti r1 67
 	leti r2 69
 	leti r3 70

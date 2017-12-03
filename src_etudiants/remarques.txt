@@ -1,8 +1,15 @@
 ## Remarques ##
 
   * Pourquoi les sauts absolus sont-ils signés ?
-  * 4 pointeurs, dont 2 utilisables, c'est vraiment **très** peu
-  * assembler les distances de saut à la main, **plus jamais** (surtout avec des opérandes de taille variable).
+  * 4 pointeurs, dont 2 utilisables, c'est vraiment **très** peu, d'autant 
+qu'on pourrait utiliser les registres en ajoutant un bit à `readze`.
+Seul problème : la pile, mais il suffirait d'ajouter une opérande `pop` qui
+ne serait plus du sucre syntaxique, et on pourrait à la rigueur supprimer
+`getctr` et `setctr`, qu'on utilise principalement pour  déplacer les
+pointeurs a0 et a1. On perdrait certes la possibilité de faire des `jump` 
+un peu artistiques en poussant des registres dans le pc.
+  * assembler les distances de saut à la main, **plus jamais** (surtout avec 
+des opérandes de taille variable).
   * utiliser des majuscules dans un nom de fichier, c'est s'exposer à 
 des problèmes sur, à tout hasard, FAT32, ou pire : FAT16.
   * Les opérateurs `sub2i` et `sub3i` permettent de faire les opérations du

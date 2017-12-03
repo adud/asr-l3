@@ -67,7 +67,7 @@ class Processor {
 
 };
 
-int sizeval(int size);//la table 2 size
+int sizeval(int size);//la table 2 size de l'isa
 bool sum_overflow(uword,uword,uword);
 bool diff_overflow(uword,uword,uword);
 //calcul du flag d'overflow (drapeau de depassement en comp a 2)

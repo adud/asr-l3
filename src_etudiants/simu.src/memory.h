@@ -21,6 +21,7 @@ const int MEM_KBD_BEGIN = 0x62000;
 const int MEM_CLOCK = 0x62080;
 //l'horloge : 0x62080 -> 0x620c0
 //et on serre les dents pour la compatibilite
+//ca passe de justesse
 
 const uint64_t MEMSIZE=1<<24; // please keep this a multiple of 64
 const int PC=0;
