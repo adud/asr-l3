@@ -67,8 +67,10 @@ Pour tester le deuxième rendu, après avoir vérifié la valeur de WORDSIZE dan
     `.obj` et les fichiers de dépendance `.d`.
 ## Le simulateur ##
 
-  * Nouvelles options :
-	* `--stats` affiche les statistiques du programme exécuté, à condition que le programme termine (_ie_ qu'il y ait une ligne sautant sur elle-même à un endroit du programme)
+Nouvelle options `--stats` affiche les statistiques du programme exécuté, à condition que le programme termine (_ie_ qu'il y ait une ligne sautant sur elle-même à un endroit du programme).
+On pourra "piper" une simulation avec un `--stats` pour une analyse graphique des fréquences d'apparition des opcodes.  
+ex : ``./simu -g -m bitmap/grlib.mem --stats asm.exec/graphic.obj | ./chart.py`
+
 
 ## Compilation ##
   * Désormais, la compilation des fichiers assembleurs est supportée par make.
