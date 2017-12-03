@@ -1,13 +1,18 @@
+; Ce programme s'étant mis à ne plus rien faire
+; Que d'étranges actions qui ne ressemblent à rien
+; Pour corriger, j'ai ajouté des commentaires
+;     Tout en Alexandrin
+
 	leti r0 0b1110011100111000
-	call graphic.s$clear_screen
+	call graphic.s$clear_screen ; ainsi fut coloré l'écran d'un bleu profond...
 
 	leti r0 0x620c0
-	setctr a1 r0
+	setctr a1 r0 ; ainsi fut aligné ce pointeur sur l'horloge...
 
 	leti r0 0x10000
-	setctr a0 r0
+	setctr a0 r0 ; tandis que son ami regardait vers l'écran
 	
-	call aff.s$wrtxt
+	call aff.s$wrtxt ; cet écran sur lequel fut affiché un texte
 	
 	leti r5 20
 	leti r0 -1
@@ -17,7 +22,10 @@
 	leti r3 60
 	leti r4 64
 	
-flp:	call graphic.s$draw
+flp:	
+    getctr a0 r6 ; saving a0
+    call graphic.s$draw
+    setctr a0 r6
 	add2i r1 8
 	add2i r3 2
 	shift left r0 1
@@ -32,7 +40,9 @@ loop:	leti r0 0
 	leti r3 98
 	leti r4 78
 
-	call graphic.s$fill
+    getctr a0 r6
+	call graphic.s$fill ; Ainsi tout se barra en sucette ici-même.
+    setctr a0 r6
 
 	push r0
 	leti r0 250
