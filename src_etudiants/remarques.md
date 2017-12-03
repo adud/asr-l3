@@ -17,3 +17,9 @@ des problèmes sur, à tout hasard, FAT32, ou pire : FAT16.
     en deux opérations avec un `leti` suivi d'un `sub2` ou `sub3` (ce qui nous
     oblige à utiliser un registre supplémentaire), ou seulement dans des cas
     particuliers de le faire en une opération avec `xor3i`.
+
+## Sur l'optimisation des échanges ##
+
+   * De manière générale, on lit beaucoup plus que l'on n'écrit.
+   * Il semblerait que la grande majorité des échanges entre la mémoire et le processeur soient dus à l'échange de morceaux de code, les échanges de données 'bruts' étant négligeables (inférieurs à 0.1%), si l'on excepte les échanges dus au simulateur d'horloge, pour faire des interruptions.
+   * Cette affirmation reste à nuancer dans des cas très orientés lecture/écriture, comme le pathologique `dd.s` où 52 bits d'instructions servent à lire et écrire 64 bits d'instruction (sur une architecture 64 bits).
