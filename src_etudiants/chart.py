@@ -5,6 +5,8 @@ from sys import stdin
 import matplotlib.pyplot as plt
 from numpy import arange
 
+plt.xkcd()
+
 data = stdin.readlines()
 opfreq = data[5:data.index("\n",6)+1]
 opfreq.pop()
