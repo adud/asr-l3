@@ -22,3 +22,5 @@ simu.obj
 
 *.html
 #pour la lecture de .md avec emacs
+
+tp1-vhdl/work/

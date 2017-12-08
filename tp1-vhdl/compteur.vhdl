@@ -11,7 +11,7 @@ end entity;
 architecture rtl of compteur is
   component Reg_N_Reset is
     generic (n : integer);
-    port(clk, reset, enable : in  std_logic;
+    port(ck, reset, enable : in  std_logic;
          d                  : in  std_logic_vector(n-1 downto 0);
          q                  : out std_logic_vector(n-1 downto 0));
   end component;
@@ -26,7 +26,7 @@ architecture rtl of compteur is
   end component;
 
   signal c1, sor, trs : std_logic_vector (n-1 downto 0);
-  signal ckc, enc, rsc : std_logic;
+  signal ckc, enc : std_logic;
 
 begin
   reg : Reg_N_Reset
@@ -35,8 +35,8 @@ begin
       d => trs,
       q => sor,
       enable => enc,
-      reset => rsc,
-      clk => ckc
+      reset => res,
+      ck => ckc
       );
   add : adder
     generic map(n => n)
@@ -46,6 +46,4 @@ begin
       s => trs
       );
   st <= sor;
-  
 end architecture;
-

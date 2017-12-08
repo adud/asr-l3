@@ -40,4 +40,3 @@ begin
   cout <= c(n);
   c(0) <= cin;
 end architecture;
-
