@@ -5,10 +5,19 @@ char t[39][7] = {"add2","add2i","sub2","sub2i","cmp","cmpi","let","leti","shift"
 		 "or2","or2i","and2","and2i","write","call","setctr","getctr","push","return","add3","add3i","sub3","sub3i",
 		 "and3","and3i","or3","or3i","xor3","xor3i","asr3","?","?","?","???"};
 
+char rcat[RCAT][7] = {"ins","dat","scr","kbd","clk"};
+char wcat[WCAT][7] = {"dat","scr"};
+
+
+void settoz(unsigned int *tb, int size)
+{
+	for(int i(0);i<size;tb[i++]=0){}
+	return;
+}
 
 Processor::Processor(Memory* m): m(m) {
 	pc=0;
-	sp=0;
+	sp=spinit;
 	a1=0;
 	a2=0;
 	for (int i=0; i<7; i++)
@@ -43,7 +52,6 @@ int Processor::von_Neuman_step(bool debug) {
 	doubleword fullr=0;
 	bool manage_flags=false; // used to factor out the flag management code
 	int instr_pc = pc; // for the debug output
-	
 	// read 4 bits.
 	read_bit_from_pc(opcode);
 	read_bit_from_pc(opcode);
@@ -147,6 +155,7 @@ int Processor::von_Neuman_step(bool debug) {
 		r[regnum1] = ur;
 		zflag = (ur==0);
 		// no change to nflag ????
+		nflag = (sword) ur < 0;
 		vflag = false;
 		manage_flags=false;		
 		break;
@@ -160,7 +169,8 @@ int Processor::von_Neuman_step(bool debug) {
 			read_reg_from_pc(regnum1);
 			
 			for(int i=0;i<size;i++){
-				ur = (ur<<1) + read_bit_proc(counter,0);
+				ur = (ur<<1) + read_bit_proc(counter,
+					      idrru(m->counter[counter]));
 				incr_count(counter);
 			}
 			r[regnum1] = ur;
@@ -173,7 +183,9 @@ int Processor::von_Neuman_step(bool debug) {
 			read_reg_from_pc(regnum1);
 			
 			for(int i=0;i<size;i++){
-				ur = (ur<<1) + read_bit_proc(counter,0);
+				ur = (ur<<1) +
+					read_bit_proc(counter, 
+					    idrru(m->counter[counter]));
 				incr_count(counter);
 			}
 			
@@ -270,7 +282,7 @@ int Processor::von_Neuman_step(bool debug) {
 			uop1 = r[regnum1];
 			for(int i=size-1;i>=0;i--)
 			{
-				write_bit_proc(counter,1 & (uop1>>i));
+				write_bit_proc(counter,1 & (uop1>>i),idwru(m->counter[counter]));
 				incr_count(counter);
 			}
 			//end sabote
@@ -314,7 +326,7 @@ int Processor::von_Neuman_step(bool debug) {
    			sp -= WORDSIZE;
 			m->set_counter(SP,sp);
 			for(int i=WORDSIZE-1;i>=0;i--)
-				write_bit_proc(SP,(uop1>>i)&1);
+				write_bit_proc(SP,(uop1>>i)&1,0);
 			m->set_counter(SP,sp);
 			manage_flags = false;
 			break;
@@ -482,26 +494,27 @@ int Processor::von_Neuman_step(bool debug) {
 	}
 
 	if (debug) {
+	  int ws = WORDSIZE/4;
 	  cout << "after instr: " << opname(opcode) 
-	       << " at pc=" << hex << setw(8) << setfill('0') << instr_pc
-	       << " (newpc=" << hex << setw(8) << setfill('0') << pc << ")" <<  endl;
-	  cout << " zcnv = " << (zflag?1:0) << (cflag?1:0) << (nflag?1:0) << (vflag?1:0) << endl;
-	  cout << " pc=" << hex << setw(8) << setfill('0') << m->counter[0] 
-				 << " sp=" << hex << setw(8) << setfill('0') << m->counter[1] 
-				 << " a0=" << hex << setw(8) << setfill('0') << m->counter[2] 
-	       << " a1=" << hex << setw(8) << setfill('0') << m->counter[3] << endl ;
+	       << " at pc=" << hex << setw(ws) << setfill('0') << instr_pc
+	       << " (newpc=" << hex << setw(ws) << setfill('0') << pc << ")" <<  endl;
+	  cout << " zncv = " << (zflag?1:0) << (nflag?1:0) << (cflag?1:0) << (vflag?1:0) << endl;
+	  cout << " pc=" << hex << setw(ws) << setfill('0') << m->counter[0] 
+				 << " sp=" << hex << setw(ws) << setfill('0') << m->counter[1] 
+				 << " a0=" << hex << setw(ws) << setfill('0') << m->counter[2] 
+	       << " a1=" << hex << setw(ws) << setfill('0') << m->counter[3] << endl ;
 			//				 << " newpc=" << hex << setw(9) << setfill('0') << pc;
 	  
 		for (int i=0; i<4; i++)
-			cout << " r"<< dec << i << "=" << hex << setw(8) << setfill('0') << r[i];
+			cout << " r"<< dec << i << "=" << hex << setw(ws) << setfill('0') << r[i];
 		cout << endl;
 		for (int i=4;i<8;i++)
-			cout << " r"<< dec << i << "=" << hex << setw(8) << setfill('0') << r[i];
+			cout << " r"<< dec << i << "=" << hex << setw(ws) << setfill('0') << r[i];
 		cout << endl;
 	}
 	if((int)pc==instr_pc){
 		if(opcode==0xa){//boucle infinie terminale
-			cout << "end detected\n";
+			cerr << "end detected\n";
 			return -1;
 		} else if(opcode==0b1110001){//return invalide
 			cout << "r7 may be erased at " << pc << endl;
@@ -517,7 +530,7 @@ int Processor::von_Neuman_step(bool debug) {
 // form now on, helper methods. Read and understand...
 
 void Processor::read_bit_from_pc(int& var) {
-	var = (var << 1) +read_bit_proc(PC,true); // the read_bit updates the memory's PC
+	var = (var << 1) +read_bit_proc(PC,0); // the read_bit updates the memory's PC
 	pc++;                             // this updates the processor's PC
 	
 }
@@ -552,13 +565,17 @@ void Processor::read_const_from_pc(uint64_t& var,bool sex) {
 	}
 	// Now we know the size and we can read all the bits of the constant.
 	for(int i=0; i<size; i++) {
-		var = (var<<1) + read_bit_proc(PC,true);
+		var = (var<<1) + read_bit_proc(PC,0);
 		pc++;
 	}
 	if(sex){
-	  int sign=(var >> (size-1)) & 1;
-	  for (int i=size; i<WORDSIZE; i++)
-	    var += sign << i;
+		if((var >> (size-1)) & 1)
+		{
+			for (int i=size; i<WORDSIZE; i++)
+			{
+				var += ((uword) 1 << i);
+			}
+		}
 	}
 }
 
@@ -592,8 +609,8 @@ void Processor::read_addr_from_pc(uword& var) {
 	// cerr << "before signext " << var << endl;
 	// sign extension
 	int sign=(var >> (size-1)) & 1;
-	for (int i=size; i<WORDSIZE; i++)
-		var += sign << i;
+	if(sign)
+		var -= (1<<size);
 	// cerr << "after signext " << var << " " << (int)var << endl;
 
 }
@@ -639,7 +656,7 @@ bool Processor::cond_true(int cond) {
 	case 6 :
 		return cflag;
 	case 7 :
-		return zflag || cflag;
+		return vflag;
 		
 // end sabote
 		
@@ -689,49 +706,38 @@ void Processor::set_count(int counter,uword offset){
 	}
 }
 
-int Processor::read_bit_proc(int ctr, bool code)
+int Processor::read_bit_proc(int ctr,int type)
 {
 	int i(m->read_bit(ctr));
-	rbitsctr++;
-	if(!code)
-		rbitsmemctr++;
+	rbitsspc[type]++;
 	return i;
 }
 
-void Processor::write_bit_proc(int ctr, int bit)
+void Processor::write_bit_proc(int ctr, int bit, int type)
 {
 	m->write_bit(ctr,bit);
-	wbitsctr++;
+	wbitsspc[type]++;
 	return;
 }
 
 void Processor::resetctrs()
 {
-	for(int i=0;i<40;i++)
-		opctr[i] = 0;
-	instr_bits_ctr = rbitsctr =
-		rbitsmemctr = wbitsctr = 0;
+	settoz(opctr,39);
+	settoz(rbitsspc,RCAT);
+	settoz(wbitsspc,WCAT);
+	instr_bits_ctr = 0;
 	return;
 }
 
 void Processor::printctrs()
 {
-	
-	unsigned int sum(0);
 	cout << "stats :\n\n";
-	for(int i=0;i<40;sum += opctr[i++]){}
-	cout << sum << " operations :\n\n";
-	for(int i=0;i<39;i++)
-		if(opctr[i])
-			cout << "\t" << t[i] << "\t" << opctr[i]
-			     << "\t" << opctr[i]*100./sum << "%\n";
-	cout << endl;
-	cout << "memory interaction :\n";
-	cout << "read : " << rbitsctr << endl;
-	cout << "(exp): " << rbitsmemctr << endl;
-
-	cout << "write: " << wbitsctr << endl;
-	
+	cout << "operations :\n\n";
+	printstats(t,opctr,40);
+	cout << "memory interaction :\n\nread :\n\n";
+	printstats(rcat,rbitsspc,RCAT);
+	cout << "write :\n\n";
+	printstats(wcat,wbitsspc,WCAT);
 				       
 }
 		
@@ -789,4 +795,49 @@ int opsize(const int opcode)
 char* opname(const int opcode)
 {
 	return t[opflat(opcode)];
+}
+
+int idwru(int addr)
+{
+	if(MEM_SCREEN_BEGIN <= addr
+	   && addr < MEM_SCREEN_END)
+		return 1;
+	return 0;
+		       
+}
+
+int idrru(int addr)
+{
+	if(MEM_SCREEN_BEGIN <= addr
+	   && addr < MEM_SCREEN_END)
+		return 2;
+	else if(MEM_KBD_BEGIN <= addr
+		&& addr < MEM_KBD_END)
+		return 3;
+	else if(MEM_CLOCK_BEGIN <= addr
+		&& addr < MEM_CLOCK_END)
+		return 4;
+	else
+		return 1;
+}
+
+unsigned int sum(unsigned int *tb, int size)
+{
+	unsigned int s(0);
+	for(int i(0);i<size;s+=tb[i++]){}
+	return s;
+}
+
+
+void printstats(char champ[][7], unsigned int *vals, int size)
+{
+	unsigned int s(0);
+	for(int i(0);i<size;s+=vals[i++]){}
+	cout << "total : " << s << endl;
+	for(int i(0);i<size;i++)
+		if(vals[i])
+			cout << "\t" << champ[i] << "\t" << vals[i]
+			     << "\t" << vals[i]*100./s << "%\n";
+	cout << endl;
+	return;
 }

@@ -1,4 +1,4 @@
-	leti r0 0x68000		
+	leti r0 0x620c0		
 	setctr a1 r0
 	leti r0 0x10000
 	setctr a0 r0
@@ -6,20 +6,21 @@
 		
 	
 	leti r0 0b1111100000111110
-	call write
+	call wrtxt
 
-	;; leti r0 10000
+	;; leti r0 0x10000
 	;; setctr sp r0
 	
 	;; leti r0 -1
-	;; leti r1 0
+	;; leti r1 2
 	;; leti r2 0
-	;; leti r3 66
+	;; leti r3 60
 	
 	;; call putchar
 	
 loop:	jump loop
-	
+
+#main
 	;; Ecrire un texte :
 	;; a0 pointe vers l'ecran (est le crayon)
 	;; a1 pointe vers le début de la chaine de car en memoire
@@ -31,8 +32,7 @@ loop:	jump loop
 	;; r6 contient la pos sur la ligne
 	;; (evite des divisions par 160...)
 
-#main
-write:	push r1
+wrtxt:	push r1
 	push r2
 	push r3
 	push r4
@@ -93,10 +93,16 @@ out:	pop r6
 	pop r1
 	return
 
-	;; FINAL
-	;;va ecrire le code ascii de r1
-	;; couleur r0
-prchr:	getctr a1 r4		
+;;FIN wrtxt
+	
+	;;va ecrire le code ascii de r1 en a0
+	;; couleur r0 
+prchr:	push r1
+	push r2
+	push r3
+	push r4
+	push r5
+	getctr a1 r4		;r4 va juste conserver a1
 	shift left r1 3
 	add2i r1 0x60000
 	setctr a1 r1
@@ -134,14 +140,33 @@ fi:
 	setctr a0 r1
 
 	setctr a1 r4
+	pop r5
+	pop r4
+	pop r3
+	pop r2
+	pop r1
 	return
-
+	;;FIN prchr 
+	
 putchar:
-	let r4 r1	;repondre aux spec du prof
+	;; ecrit le caractere dont:
+	;;  - la couleur est r0
+	;;  - les coordonnees sont r1,r2
+	;;  - le code ascii est r3
+	;;
+	push r1
+	push r2
+	push r3
+	push r4
+	getctr a0 r4
+	push r4
+	leti r4 120
+	sub3 r2 r4 r2
+	let r4 r2	;repondre aux spec du prof
 	shift left r4 2
-	add2 r4 r1
-	shift left r4 5
 	add2 r4 r2
+	shift left r4 5
+	add2 r4 r1
 	shift left r4 4
 	add2i r4 0x10000
 	setctr a0 r4
@@ -149,6 +174,14 @@ putchar:
 	push r7
 	call prchr
 	pop r7
+	pop r4
+	setctr a0 r4
+	pop r4
+	pop r3
+	pop r2
+	pop r1
 	return
+
+	;; FIN putchar
 #include div.s
 #endmain

@@ -3,6 +3,8 @@
 
 void simulate_screen(Memory* m,  bool* refresh) {
 	/*initialise sdl and create the screen*/
+	refresh = refresh; //to ignore refresh
+	
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_Window *window = SDL_CreateWindow("Asm", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH*2, HEIGHT*2, 0);
 	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
@@ -13,6 +15,8 @@ void simulate_screen(Memory* m,  bool* refresh) {
 	bool escape = false;
 	/*temp buffer*/
 	uint32_t tempscreen[WIDTH * HEIGHT];
+	
+	volatile const Uint8 *state = SDL_GetKeyboardState(NULL);
 
 	while (!escape) {
 
@@ -24,6 +28,11 @@ void simulate_screen(Memory* m,  bool* refresh) {
 				if (e.key.keysym.sym == SDLK_ESCAPE)
 					escape = true;
 			}
+			for(int i=0;i<128;i++){
+			    m->write_bit_raw(MEM_KBD_BEGIN + i,
+					     state[i]);
+			}
+		      
 		}
 		/* if we need to refresh the screen*/
 		if (true) {
@@ -31,7 +40,14 @@ void simulate_screen(Memory* m,  bool* refresh) {
 			// i is a counter of 16-bit words
 			for (unsigned int i=0; i < HEIGHT*WIDTH; i++) {
 				uint64_t mword = m->m[ (MEM_SCREEN_BEGIN >>6) + (i>>2)];
-				uint16_t pixel = (mword >> ((i&3)<<4)) & 0xffff;
+				uint16_t pixrev = (mword >> ((i&3)<<4)) & 0xffff;
+				uint16_t pixel(0);
+
+				for(int i(0);i<16;i++){
+				  pixel |= pixrev&1;
+				  pixel <<=1;
+				  pixrev >>=1;
+				}
 				
 				uint32_t blue = pixel & ((1<<5)-1); 
 				uint32_t green = (pixel>>5) & ((1<<5)-1); 

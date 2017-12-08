@@ -22,7 +22,8 @@ size_of_address = {}
 # For each jump instruction, maps the line of the instruction to the
 # size of the address operand contained in the instruction.
 
-WORDSIZE = 32 #must be the same in simu.src/types.h
+verb = 0
+VBMAX = 2
 nb_iterations = 4
 
 def error(e):
@@ -56,7 +57,7 @@ def asm_addr_signed(s, iteration, instruction):
     # Is it a label or a constant? 
     if (s[0]>='0' and s[0]<='9') or s[0]=='-' or s[0]=='+' or s[0:2] == "0x" \
        or s[0:3] == "-0x":
-        val=int(s) # TODO  catch exception here
+        val=int(s,0) # TODO  catch exception here
         # The following is not very elegant but easy to trust
         if val>=-128 and val<= 127:
             return '0 ' + binary_repr(val, 8)
@@ -106,7 +107,8 @@ def asm_addr_signed(s, iteration, instruction):
             address = labels[s]
         size = size_of_address[line]
         prefixes = {8:"0 ", 16:"10 ", 32:"110 "}
-        print address
+        if verb >= VBMAX:
+            print address
         return prefixes[size] + binary_repr(address, size)
             
     else:
@@ -179,7 +181,7 @@ def asm_shiftval(s):
 
 def asm_condition(cond):
     """converts the string cond into its encoding in the condition code. """
-    condlist = {"eq":"000", "z":"000",  "neq":"001",  "nz":"001",  "sgt":"010",  "slt":"011",  "gt":"100",  "ge":"101",  "nc":"101",  "lt":"110",  "c":"110",  "le":"111"}
+    condlist = {"eq":"000", "z":"000",  "neq":"001",  "nz":"001",  "sgt":"010",  "slt":"011",  "gt":"100",  "ge":"101",  "nc":"101",  "lt":"110",  "c":"110",  "v":"111"}
     if cond in condlist:
         val = condlist[cond]
         return val + " "
@@ -223,6 +225,21 @@ def get_lines(filename):
     lines = [l[:-1] for l in lines] # remove the last '\n' characters
     return lines
 
+def get_path(file):
+    global filename
+    
+    if file[0] != "/": # relative file name
+        # we want to get the current directory, so everything after the last
+        # '/' character is removed
+        path_list = filename.split("/")
+        # the 'name' variable replace the last element of 'path'
+        path_list[-1] = file
+        return "/".join(path_list)
+    else:
+        # absolute file name
+        return file
+
+
 def include_file(i_file, baselabel):
     """Load a file, and return the code lines. If two lines '#main' and
     '#endmain' are defined, load only the code between these two lines.
@@ -230,22 +247,12 @@ def include_file(i_file, baselabel):
     The code lines are returned as a list.
 
     i_file : the file to include"""
-    global filename
 
     # the name of the included file is added after the base label, followed by
     # the '$' character. This character is reserved.
     baselabel += i_file + "$"
-    
-    if i_file[0] != "/": # relative file name
-        # we want to get the current directory, so everything after the last
-        # "/" character is removed
-        path = filename.split("/")
-        # the 'name' variable replace the last element of 'path'
-        path.pop()
-        path.append(i_file)
-        i_file = "/".join(path)
 
-    lines = get_lines(i_file)
+    lines = get_lines(get_path(i_file))
     
     main_expr = re.compile("^#main\s*($|;)")
     endmain_expr = re.compile("^#endmain\s*($|;)")
@@ -257,7 +264,7 @@ def include_file(i_file, baselabel):
 
     if main_lines == [] and endmain_lines == []:
         # recursively preprocessing the lines
-        return preprocess(lines, baselabel)
+        return preprocess(lines, baselabel, False, "")
     elif len(main_lines) > 1:
         raise BaseException("Loading error : too much #main directives.")
     elif len(endmain_lines) > 1:
@@ -273,13 +280,13 @@ def include_file(i_file, baselabel):
             raise BaseException("Loading error : #main directive "
                                 "defined after #endmain.")
 
-        return preprocess(lines[main+1:endmain], baselabel)
+        return preprocess(lines[main+1:endmain], baselabel, False, "")
 
-def preprocess(lines, baselabel=""):
+def preprocess(lines, baselabel="", make_dependencies=False, base_obj_file=""):
     """Apply the preprocesor operations to a list of lines.
     baselabel is the string that is added before every label."""
     # we assume that the user use neither ';' nor whitespace characters in
-    include_expr = re.compile("^#include (?P<i_file>([^;]|\S)+)\s*($|;)")
+    include_expr = re.compile("^#include\s+(?P<i_file>[^;\s]+)\s*($|;)")
     main_expr = re.compile("^#main\s*($|;)")
     endmain_expr = re.compile("^#endmain\s*($|;)")
         
@@ -327,9 +334,16 @@ def preprocess(lines, baselabel=""):
     for i_file in files_to_include:
         final_lines.extend(include_file(i_file, baselabel))
 
-    print "After the preprocessing operation :"
-    for l in final_lines:
-        print l
+    if verb>=VBMAX:
+        print "After the preprocessing operation :"
+        for l in final_lines:
+            print l
+
+    if make_dependencies:
+        with open(base_obj_file + ".d", "w") as f:
+            path_to_include = [get_path(file) for file in files_to_include]
+            f.write(base_obj_file + ".obj" + ": " +
+                    " ".join(path_to_include) + "\n\n")
 
     return final_lines
 
@@ -342,11 +356,14 @@ def asm_pass(iteration, lines):
     line = 0
     new_labels = {}
     new_end_of_instr = {}
-    print "\n PASS " + str(iteration)
+    if verb>=1:
+        print "PASS " + str(iteration)
     current_address = 0
     for source_line in lines:
-        instruction_encoding="" 
-        print "processing " + source_line # just to get rid of the final newline
+        instruction_encoding=""
+        if verb >= VBMAX:
+            print "processing " + source_line # just to get rid of the
+            #final newline
 
         # if there is a comment, get rid of it
         index = str.find(source_line, ";")
@@ -404,11 +421,11 @@ def asm_pass(iteration, lines):
             if opcode == "or2" and token_count==3:
                 instruction_encoding = "110000 " + asm_reg(tokens[1]) + asm_reg(tokens[2])
             if opcode == "or2i" and token_count==3:
-                instruction_encoding = "110001 " + asm_reg(tokens[1]) + asm_const_signed(tokens[2])
+                instruction_encoding = "110001 " + asm_reg(tokens[1]) + asm_const_unsigned(tokens[2])
             if opcode == "and2" and token_count==3:
                 instruction_encoding = "110010 " + asm_reg(tokens[1]) + asm_reg(tokens[2])
             if opcode == "and2i" and token_count==3:
-                instruction_encoding = "110011 " + asm_reg(tokens[1]) + asm_const_signed(tokens[2])
+                instruction_encoding = "110011 " + asm_reg(tokens[1]) + asm_const_unsigned(tokens[2])
             if opcode == "write" and token_count == 4:
                 instruction_encoding = "110100 " + asm_counter(tokens[1]) + asm_size(tokens[2]) + \
                                        asm_reg(tokens[3])
@@ -443,20 +460,20 @@ def asm_pass(iteration, lines):
                                        asm_reg(tokens[3])
             if opcode == "and3i" and token_count == 4:
                 instruction_encoding = "1110111 " + asm_reg(tokens[1]) + asm_reg(tokens[2]) + \
-                                       asm_const_signed(tokens[3])
+                                       asm_const_unsigned(tokens[3])
     
             if opcode == "or3" and token_count == 4:
                 instruction_encoding = "1111000 " + asm_reg(tokens[1]) + asm_reg(tokens[2]) + \
                                        asm_reg(tokens[3])
             if opcode == "or3i" and token_count == 4:
                 instruction_encoding = "1111001 " + asm_reg(tokens[1]) + asm_reg(tokens[2]) + \
-                                       asm_const_signed(tokens[3])
+                                       asm_const_unsigned(tokens[3])
             if opcode == "xor3" and token_count == 4:
                 instruction_encoding = "1111010 " + asm_reg(tokens[1]) + asm_reg(tokens[2]) + \
                                        asm_reg(tokens[3])
             if opcode == "xor3i" and token_count == 4:
                 instruction_encoding = "1111011 " + asm_reg(tokens[1]) + asm_reg(tokens[2]) + \
-                                       asm_const_signed(tokens[3])
+                                       asm_const_unsigned(tokens[3])
             if opcode == "asr3" and token_count == 4:
                 instruction_encoding = "1111100 " + asm_reg(tokens[1]) + asm_reg(tokens[2]) + \
                                        asm_shiftval(tokens[3])
@@ -470,8 +487,9 @@ def asm_pass(iteration, lines):
                 compact_encoding = ''.join(instruction_encoding.split()) 
                 instr_size = len(compact_encoding)
                 # Debug output
-                print "... @" + str(current_address) + " " + binary_repr(current_address,16) + "  :  " + compact_encoding
-                print  "                          "+  instruction_encoding+ "   size=" + str(instr_size)    
+                if verb >= VBMAX:
+                    print "... @" + str(current_address) + " " + binary_repr(current_address,16) + "  :  " + compact_encoding
+                    print  "                          "+  instruction_encoding+ "   size=" + str(instr_size)    
                 current_address += instr_size
                 if opcode in ("jump", "jumpif"):
                     new_end_of_instr[line] = current_address
@@ -489,25 +507,47 @@ def asm_pass(iteration, lines):
 #/* main */
 if __name__ == '__main__':
 
-    argparser = argparse.ArgumentParser(description='This is the assembler for the ASR2017 processor @ ENS-Lyon')
-    argparser.add_argument('filename', help='name of the source file.  "python asm.py toto.s" assembles toto.s into toto.obj')
-
+    argparser = argparse.ArgumentParser(description='This is the assembler '
+                                        'for the ASR2017 processor @ ENS-Lyon')
+    argparser.add_argument('filename', help='name of the source file.  '
+                           '"python asm.py toto.s" assembles toto.s into toto.obj')
+    argparser.add_argument('-a', '--architecture', type=int, choices=(32, 64),
+                           default=32, help='Decide wether it is a 32 or a 64 '
+                                            'bits architecture. Default is 32')
+    argparser.add_argument('-v', '--verbose', type=int, default=0,
+                           help='verbose output')
+    argparser.add_argument('-MD', '--make_dependencies',
+                           help="generate a file containing dependencies",
+                           action="store_true")
+    argparser.add_argument('-o', '--outfile')
     options=argparser.parse_args()
     filename = options.filename
-    basefilename, extension = os.path.splitext(filename)
-    obj_file = basefilename+".obj"
+    WORDSIZE = options.architecture
+    verb = options.verbose
+    make_dependencies = options.make_dependencies
+    if options.outfile is None:
+        basefilename, extension = os.path.splitext(filename)
+        obj_file = basefilename+".obj"
+        base_obj_file = basefilename
+    else:
+        base_obj_file, extension = os.path.splitext(options.outfile)
+        obj_file = options.outfile
 
-    lines = preprocess(get_lines(filename))
+    print make_dependencies
+    lines = preprocess(get_lines(filename), "", make_dependencies,
+                       base_obj_file)
     for i in range(1, nb_iterations + 1):
         code = asm_pass(i, lines)
     
     # statistics
-    print "Average instruction size is " + str(1.0*current_address/len(code))
     
     outfile = open(obj_file, "w")
     for instr in code:
         outfile.write(instr)
         outfile.write("\n")
 
-
+    if verb >= 1:
+        print "Average instruction size is " + str(1.0*current_address/len(code))
+        print "with version ==" + str(WORDSIZE) + "=="
     outfile.close()
+    

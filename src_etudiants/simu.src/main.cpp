@@ -3,6 +3,7 @@
 #include <vector>
 #include <cstdio>
 #include <algorithm>
+#include <ctime>
 
 #include <SDL2/SDL.h>
 #include <stdint.h>
@@ -41,7 +42,7 @@ void usage() {
 
 
 int main(int argc, char* argv[]) {
-	
+	std::cerr << "emulator for ==" << WORDSIZE << "== architecture\n";  
 	if(argc==1) {
 		usage();
 	}
@@ -58,7 +59,7 @@ int main(int argc, char* argv[]) {
 	
 	Memory* m;
 	Processor* p;
-	std::thread* screen;
+	std::thread* screen(NULL);
 		
 	m= new Memory();
 	p = new Processor(m);
@@ -77,6 +78,8 @@ int main(int argc, char* argv[]) {
 	  the content of <filename> will be stored in memory in 
 	  <hex address>
 	*/
+
+	
 
 	if(cmdOptionExists(argv,argv+argc, "-m")){
 		//change filename extension
@@ -113,7 +116,21 @@ int main(int argc, char* argv[]) {
 	bool ppl(true);
 	int prof(0);//for step-by-step
 	// The von Neuman cycle
+
+	clock_t beg(clock());
+	clock_t act(beg);
+
+	uword time_ms(0);
+	
 	while(1+1==2) {
+		act = clock();
+		time_ms = (uword) (((float)(act-beg))/
+			       (CLOCKS_PER_SEC/1000.));
+		//std::cout << time_ms << std::endl;
+		for(int i=63;i>=0;i--){
+			m->write_bit_raw(MEM_CLOCK_BEGIN+63-i,1&time_ms>>i);
+		}
+		
 		lastopc = p->von_Neuman_step(debug&&ppl);
 		if(lastopc==-1)
 			break;

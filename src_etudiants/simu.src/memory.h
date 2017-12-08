@@ -12,11 +12,26 @@
 
 #include "types.h"
 
+//decrit la position d'objets dans la memoire
+
+const int MEM_SCREEN_BEGIN = 0x10000;// -> 0x60000
+const int MEM_SCREEN_END = 0x60000;
+//de la place pour un aff ascii 0x60000 -> 0x62000
+const int MEM_KBD_BEGIN = 0x62000;
+const int MEM_KBD_END = 0x62080;
+//la reception du clavier 0x62000 -> 0x62080
+const int MEM_CLOCK_BEGIN = 0x62080;
+const int MEM_CLOCK_END = 0x620c0;
+//l'horloge : 0x62080 -> 0x620c0
+//et on serre les dents pour la compatibilite
+//ca passe de justesse
+
 const uint64_t MEMSIZE=1<<24; // please keep this a multiple of 64
 const int PC=0;
 const int SP=1;
 const int A0=2;
 const int A1=3;
+const uword spinit(0x10000);
 
 class Memory {
  public:
@@ -26,6 +41,7 @@ class Memory {
 
 	/** ctr should be one of PC, SP, A0, A1 */
 	void write_bit(int ctr, int bit);
+	void write_bit_raw(uint64_t addr,int bit);
 
 	/** ctr should be one of PC, SP, A0, A1 */
 	void set_counter(int ctr, uword val);
