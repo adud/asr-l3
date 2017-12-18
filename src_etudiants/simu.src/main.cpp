@@ -40,6 +40,12 @@ void usage() {
 		exit(0);
 }
 
+uint64_t rule30(const uint64_t q)
+{
+	const uint64_t p = (q>>1) + ((q&1)<<63);
+	const uint64_t r = (q<<1) + (q>>63);
+	return p^(q|r);
+}
 
 int main(int argc, char* argv[]) {
 	std::cerr << "emulator for ==" << WORDSIZE << "== architecture\n";  
@@ -68,8 +74,6 @@ int main(int argc, char* argv[]) {
 		std::cerr << "can't access obj file" << std::endl;
 		usage();
 	}
-
-
 	
 	/*load more files in memory
 	  if file.obj is executed, and there is a file file.mem in the 
@@ -78,8 +82,6 @@ int main(int argc, char* argv[]) {
 	  the content of <filename> will be stored in memory in 
 	  <hex address>
 	*/
-
-	
 
 	if(cmdOptionExists(argv,argv+argc, "-m")){
 		//change filename extension
@@ -115,13 +117,15 @@ int main(int argc, char* argv[]) {
 	int lastopc(0);
 	bool ppl(true);
 	int prof(0);//for step-by-step
-	// The von Neuman cycle
+
 
 	clock_t beg(clock());
 	clock_t act(beg);
 
+	m->m[MEM_RGEN_BEGIN/64]=beg;
+		
 	uword time_ms(0);
-	
+	// The von Neuman cycle	
 	while(1+1==2) {
 		act = clock();
 		time_ms = (uword) (((float)(act-beg))/
@@ -130,6 +134,8 @@ int main(int argc, char* argv[]) {
 		for(int i=63;i>=0;i--){
 			m->write_bit_raw(MEM_CLOCK_BEGIN+63-i,1&time_ms>>i);
 		}
+
+		m->m[MEM_RGEN_BEGIN/64]=rule30(m->m[MEM_RGEN_BEGIN/64]);
 		
 		lastopc = p->von_Neuman_step(debug&&ppl);
 		if(lastopc==-1)

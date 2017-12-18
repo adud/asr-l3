@@ -26,6 +26,10 @@ const int MEM_CLOCK_END = 0x620c0;
 //et on serre les dents pour la compatibilite
 //ca passe de justesse
 
+const int MEM_RGEN_BEGIN = 0x620c0;
+const int MEM_RGEN_END = 0x62100;
+//le generateur pseudo-aleatoire (Wolfram garanti non-lineaire rule 30)
+
 const uint64_t MEMSIZE=1<<24; // please keep this a multiple of 64
 const int PC=0;
 const int SP=1;
