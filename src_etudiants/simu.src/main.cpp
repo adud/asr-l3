@@ -142,11 +142,10 @@ int main(int argc, char* argv[]) {
 			break;
 		if(step_by_step){
 			if(ppl){
-				
 				sin=getchar();
 				if(sin!='\n')
 					getchar();
-				if(lastopc==0x35&&sin=='n')//call
+				if(sin=='n')//call
 				{
 					ppl=false;
 					prof=1;
