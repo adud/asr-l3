@@ -10,11 +10,11 @@
 	call fix2int
 loop:	jump loop
 	
-#main
+.main
 	
-#include mult16.s
-#include mult.s
-#include div.s
+.include mult16.s
+.include mult.s
+.include div.s
 
 	;; fait passer r0 d'entier a virgule fixe
 	
@@ -55,4 +55,4 @@ divfx:	return
 	
 
 
-#endmain
+.endmain

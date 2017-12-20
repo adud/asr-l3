@@ -9,7 +9,7 @@
 	call div
 end:	jump end
 
-#main
+.main
 div:	push r3
 	leti r2 0
 	let r3 r1
@@ -31,4 +31,4 @@ cond: ; On s'arrête quand r3 vaut de r1.
 
 	pop r3
 	return
-#endmain
+.endmain

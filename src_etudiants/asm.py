@@ -241,8 +241,8 @@ def get_path(file):
 
 
 def include_file(i_file, baselabel):
-    """Load a file, and return the code lines. If two lines '#main' and
-    '#endmain' are defined, load only the code between these two lines.
+    """Load a file, and return the code lines. If two lines '.main' and
+    '.endmain' are defined, load only the code between these two lines.
 
     The code lines are returned as a list.
 
@@ -254,8 +254,8 @@ def include_file(i_file, baselabel):
 
     lines = get_lines(get_path(i_file))
     
-    main_expr = re.compile("^#main\s*($|;)")
-    endmain_expr = re.compile("^#endmain\s*($|;)")
+    main_expr = re.compile("^\.main\s*($|;)")
+    endmain_expr = re.compile("^\.endmain\s*($|;)")
 
     main_lines = [i for (i, l) in enumerate(lines)
                   if main_expr.match(l) is not None]
@@ -266,19 +266,19 @@ def include_file(i_file, baselabel):
         # recursively preprocessing the lines
         return preprocess(lines, baselabel, False, "")
     elif len(main_lines) > 1:
-        raise BaseException("Loading error : too much #main directives.")
+        raise BaseException("Loading error : too much .main directives.")
     elif len(endmain_lines) > 1:
-        raise BaseException("Loading error : too much #endmain directives.")
+        raise BaseException("Loading error : too much .endmain directives.")
     elif main_lines == []:
-        raise BaseException("Loading error : #main directive missing.")
+        raise BaseException("Loading error : .main directive missing.")
     elif endmain_lines == []:
-        raise BaseException("Loading error : #endmain directive missing.")
+        raise BaseException("Loading error : .endmain directive missing.")
     else:
         [main] = main_lines
         [endmain] = endmain_lines
         if main >= endmain:
-            raise BaseException("Loading error : #main directive "
-                                "defined after #endmain.")
+            raise BaseException("Loading error : .main directive "
+                                "defined after .endmain.")
 
         return preprocess(lines[main+1:endmain], baselabel, False, "")
 
@@ -286,14 +286,14 @@ def preprocess(lines, baselabel="", make_dependencies=False, base_obj_file=""):
     """Apply the preprocesor operations to a list of lines.
     baselabel is the string that is added before every label."""
     # we assume that the user use neither ';' nor whitespace characters in
-    include_expr = re.compile("^#include\s+(?P<i_file>[^;\s]+)\s*($|;)")
-    main_expr = re.compile("^#main\s*($|;)")
-    endmain_expr = re.compile("^#endmain\s*($|;)")
+    include_expr = re.compile("^\.include\s+(?P<i_file>[^;\s]+)\s*($|;)")
+    main_expr = re.compile("^\.main\s*($|;)")
+    endmain_expr = re.compile("^\.endmain\s*($|;)")
         
     final_lines = []
     files_to_include = [] # files are included at the end.
     for l in lines:
-        if l != "" and l[0] == "#":
+        if l != "" and l[0] == ".":
             # this line is a directive
             m = include_expr.match(l)
             if m is not None:

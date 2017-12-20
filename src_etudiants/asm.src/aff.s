@@ -20,8 +20,8 @@
 	
 loop:	jump loop
 
-#main
-#include div.s
+.main
+.include div.s
 	;; Ecrire un texte :
 	;; a0 pointe vers l'ecran (est le crayon)
 	;; a1 pointe vers le début de la chaine de car en memoire
@@ -184,4 +184,4 @@ putchar:
 	return
 
 	;; FIN putchar
-#endmain
+.endmain

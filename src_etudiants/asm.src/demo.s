@@ -3,8 +3,8 @@
 ; Pour corriger, j'ai ajouté des commentaires
 ;     Tout en Alexandrin
 
-#include graphic.s
-#include aff.s
+.include graphic.s
+.include aff.s
 
 	leti r0 0b1110011100111000
 	call graphic.s$clear_screen ; ainsi fut coloré l'écran d'un bleu profond...

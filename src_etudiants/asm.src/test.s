@@ -1,4 +1,4 @@
-#include mult.s
+.include mult.s
 	leti r0 0x68000
 	setctr a1 r0
 	
