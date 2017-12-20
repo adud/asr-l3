@@ -344,6 +344,7 @@ def preprocess(lines, baselabel="", make_dependencies=False, base_obj_file=""):
             path_to_include = [get_path(file) for file in files_to_include]
             f.write(base_obj_file + ".obj" + ": " +
                     " ".join(path_to_include) + "\n\n")
+            # now, as the .s files are have no rules associated with,
 
     return final_lines
 

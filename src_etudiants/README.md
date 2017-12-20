@@ -27,9 +27,26 @@
 
 # Deuxième Rendu #
 
+Pour tester le deuxième rendu, après avoir vérifié la valeur de WORDSIZE dans `config`, taper `make r2` dans le répertoire racine, ou bien, après avoir compilé : `./simu -g -m bitmap/grlib.mem asm.exec/demo.obj`
+
 ## Réorganisation du projet ##
 
-  * Séparation du dossier `ASM` en deux sous-dossiers : `asm.src` conteant tous
+.  
+├── asm.exec -> les exécutables du projet (.obj) avec leurs dépendances (.d)  
+├── asm.py -> l'assembleur  
+├── asm.src -> les fichiers en assembleur (.s)  
+├── bitmap -> quelques outils pour afficher du texte  
+├── .config -> fichier indiquant l'architecture (32 ou 64 bits)  
+├── Makefile  
+├── README.md -> ce fichier  
+├── remarques.txt  
+├── simu -> le simulateur du processeur  
+├── simu.obj -> les exécutables nécessaires au simulateur (.o) et leur deps(.d)  
+├── simu.src -> le code du simulateur (.cpp)  
+└── todo.md -> une petite liste de choses à faire pour impressionner F.  
+
+5 directories, 8 files
+
 
 ## L'assembleur ##
 
@@ -48,6 +65,10 @@
       cible avec son extension remplacée par `.d`.
     les fichier assembleurs `.s` et `asm.exec` contenant les fichiers objets
     `.obj` et les fichiers de dépendance `.d`.
+## Le simulateur ##
+
+  * Nouvelles options :
+	* `--stats` affiche les statistiques du programme exécuté, à condition que le programme termine (_ie_ qu'il y ait une ligne sautant sur elle-même à un endroit du programme)
 
 ## Compilation ##
   * Désormais, la compilation des fichiers assembleurs est supportée par make.

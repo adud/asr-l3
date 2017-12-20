@@ -1,4 +1,6 @@
-#include "memory.h" 
+#include "memory.h"
+#define RCAT 5
+#define WCAT 2
 
 class Processor {
  public:
@@ -33,12 +35,12 @@ class Processor {
 	//incremente le counter *du proc* en argument
 	void set_count(int counter,uword offset);
 	//met a offset le counter *du proc* en argument
-	int read_bit_proc(int ctr, bool code);
+	int read_bit_proc(int ctr, int type);
 	//appelle read_bit de la memoire, et incremente les
 	//compteurs de lecture
 	//si code vaut 1, les bits lus sont consideres comme du
 	//code et non-ajoutes a rbitsprgctr
-	void write_bit_proc(int ctr, int bit);
+	void write_bit_proc(int ctr, int bit, int type);
 	//idem
 		
 	Memory *m;
@@ -60,14 +62,25 @@ class Processor {
 	unsigned int opctr[40]; //compte le nb d'appels a chq op
 	unsigned int instr_bits_ctr;//compte le nb de bits d'instr
 
-	unsigned int rbitsctr;//compte le nb de bits lus
-	unsigned int rbitsmemctr;//compte le nb de bits lus, en
-	//dehors de ceux par le programme
-	unsigned int wbitsctr;//compte le nombre de bits ecrits
+	unsigned int rbitsspc[RCAT];//compte le nb de bits lus
+	/*
+	  0:code
+	  1:data
+	  2:screen
+	  3:keyboard
+	  4:clock
+
+	 */
+       
+	unsigned int wbitsspc[WCAT];//compte le nombre de bits ecrits
+	/*
+	  0:data
+	  1:screen
+	 */
 
 };
 
-int sizeval(int size);//la table 2 size
+int sizeval(int size);//la table 2 size de l'isa
 bool sum_overflow(uword,uword,uword);
 bool diff_overflow(uword,uword,uword);
 //calcul du flag d'overflow (drapeau de depassement en comp a 2)
@@ -78,3 +91,9 @@ int opsize(int opcode);
 //retourne la taille de l'opcode
 char* opname(int opcode);
 //retourne une chaine contenant le nom de l'operation de no opcode
+int idrru(int addr);
+//determine quel est le type de memoire lu (pour les stats)
+int idwru(int addr);
+//idem
+void printstats(char champ[][7],unsigned int *vals, int size);
+//affiche les stats d'un champ

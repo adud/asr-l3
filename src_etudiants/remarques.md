@@ -1,0 +1,25 @@
+## Remarques ##
+
+  * Pourquoi les sauts absolus sont-ils signés ?
+  * 4 pointeurs, dont 2 utilisables, c'est vraiment **très** peu, d'autant 
+qu'on pourrait utiliser les registres en ajoutant un bit à `readze`.
+Seul problème : la pile, mais il suffirait d'ajouter une opérande `pop` qui
+ne serait plus du sucre syntaxique, et on pourrait à la rigueur supprimer
+`getctr` et `setctr`, qu'on utilise principalement pour  déplacer les
+pointeurs a0 et a1. On perdrait certes la possibilité de faire des `jump` 
+un peu artistiques en poussant des registres dans le pc.
+  * assembler les distances de saut à la main, **plus jamais** (surtout avec 
+des opérandes de taille variable).
+  * utiliser des majuscules dans un nom de fichier, c'est s'exposer à 
+des problèmes sur, à tout hasard, FAT32, ou pire : FAT16.
+  * Les opérateurs `sub2i` et `sub3i` permettent de faire les opérations du
+    type `ri <- rj - cst`, mais pas `ri <- cst - rj`. On est obligé de le faire
+    en deux opérations avec un `leti` suivi d'un `sub2` ou `sub3` (ce qui nous
+    oblige à utiliser un registre supplémentaire), ou seulement dans des cas
+    particuliers de le faire en une opération avec `xor3i`.
+
+## Sur l'optimisation des échanges ##
+
+   * De manière générale, on lit beaucoup plus que l'on n'écrit.
+   * Il semblerait que la grande majorité des échanges entre la mémoire et le processeur soient dus à l'échange de morceaux de code, les échanges de données 'bruts' étant négligeables (inférieurs à 0.1%), si l'on excepte les échanges dus au simulateur d'horloge, pour faire des interruptions.
+   * Cette affirmation reste à nuancer dans des cas très orientés lecture/écriture, comme le pathologique `dd.s` où 52 bits d'instructions servent à lire et écrire 64 bits d'instruction (sur une architecture 64 bits).
