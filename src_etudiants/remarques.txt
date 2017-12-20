@@ -21,5 +21,6 @@ des problèmes sur, à tout hasard, FAT32, ou pire : FAT16.
 ## Sur l'optimisation des échanges ##
 
    * De manière générale, on lit beaucoup plus que l'on n'écrit.
-   * Il semblerait que la grande majorité des échanges entre la mémoire et le processeur soient dus à l'échange de morceaux de code, les échanges de données 'bruts' étant négligeables (inférieurs à 0.1%), si l'on excepte les échanges dus au simulateur d'horloge, pour faire des interruptions.
+   * Il semblerait que la grande majorité des échanges entre la mémoire et le processeur soient dus à l'échange de morceaux de code, les échanges de données 'bruts' étant négligeables (inférieurs à 5%) (exception faite des routines écoutant le clavier ou l'horloge simulés dans la mémoire). Ainsi, minimiser les échanges reviendrait simplement à minimiser la taille du code.
    * Cette affirmation reste à nuancer dans des cas très orientés lecture/écriture, comme le pathologique `dd.s` où 52 bits d'instructions servent à lire et écrire 64 bits d'instruction (sur une architecture 64 bits).
+   * Pour ce qui est d'optimiser les écritures, on peut de même considérer comme négligeable l'ensemble des écritures à partir du moment où on utilise l'écran, un clear_screen écrivant 0x50000 bits d'un coup.

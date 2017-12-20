@@ -567,8 +567,7 @@ void Processor::read_const_from_pc(uint64_t& var,bool sex) {
 	for(int i=0; i<size; i++) {
 		var = (var<<1) + read_bit_proc(PC,0);
 		pc++;
-	}		
-	
+	}
 	if(sex){
 		if((var >> (size-1)) & 1)
 		{

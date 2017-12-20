@@ -22,3 +22,8 @@ simu.obj
 
 *.html
 #pour la lecture de .md avec emacs
+
+
+#VHDL
+tp1-vhdl/work/
+tp1-vhdl/chronogram.fst

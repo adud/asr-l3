@@ -1,6 +1,7 @@
     leti r0 0x10000
     setctr sp r0 ; initialisiation du pointeur de pile
-    
+	call clear_screen    
+
     leti r0 0b100110001111111
     leti r1 56
     leti r2 56

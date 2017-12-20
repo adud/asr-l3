@@ -1,8 +1,9 @@
 	;;Multiplication :
 	;; si avant appel r0=A,r1=B, A*B < 2**16
 	;; apres appel r2=A*B
-	leti r0 1928
-	leti r1 2893
+	;; conservation des registres
+	leti r0 0xa
+	leti r1 0xd
 	call mult
 loop:	jump loop
 

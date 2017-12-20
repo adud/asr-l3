@@ -1,12 +1,13 @@
 	;; Multiplication 32 bits
 	;; si avant appel r0=A,r1=B, A*B <2**32
 	;; apres appel r2*2**16 + r3 = A*B
+	;; conservation des registres r4-7
 	leti r0 10000
 	setctr sp r0		;stinit
 	
-	leti r0 0x0fff
-	leti r1 0x1001
-	call mult16
+	leti r0 0x1144aec4	;a,b : 0001,ffff
+	leti r1 0x8c7d74d5	;c,d : 1000,0001
+	call mult32
 end:	jump end
 
 #main
@@ -39,4 +40,81 @@ cond:
 	pop r4
 	return
 
+	;; apres une multiplication 32 bits
+	;; A*B = r2*2**16 + r3
+	;; apres fusion
+	;; A*B = r2
+fusion:	
+	shift left r2 16
+	add2 r2 r3
+	return
+	;; multiplication 32 bits
+	;; {r0 = uint32 A, r1 = uint32 B,
+	;; A*B < 2**64}
+	;; mult32
+	;; {r2=C,r3=D, A*B = C*2**32 + D }
+	;; tous les registres sont massacres
+	
+mult32:
+	push r7			;A = aE + b; B= cE + d; E=2**16 
+	and3i r5 r0 0xffff
+	and3i r6 r1 0xffff
+	shift right r0 16
+	shift right r1 16
+	
+	push r0
+	push r1
+	
+	let r1 r6
+	
+	call mult16
+	call fusion
+
+	let r4 r2
+	let r0 r5
+	let r1 r6
+
+	call mult16
+	call fusion
+
+	let r6 r2
+	let r0 r5
+	pop r1
+	push r1
+
+	call mult16
+	call fusion
+
+	let r5 r2
+
+	pop r1
+	pop r0
+
+	call mult16
+	call fusion
+	
+	;r23456 : ac,??,ad,bc,bd
+
+	let r0 r4
+	let r1 r5
+	shift left r0 16
+	shift left r1 16
+	shift right r4 16
+	shift right r5 16
+
+	add2 r6 r0
+	jumpif nc sk1
+	add2i r2 1
+sk1:	add2 r6 r1
+	jumpif nc sk2
+	add2i r2 1
+sk2:
+	add2 r2 r4
+	add2 r2 r5
+
+	let r3 r6
+		
+	pop r7
+	return
+	
 #endmain
