@@ -10,7 +10,9 @@
 	call mults
 loop:	jump loop
 
-#main
+.main
+
+.include mult.s
 
 mults:	push r3
 	push r4
@@ -35,6 +37,4 @@ cpos:	pop r5
 	pop r3
 	return
 	
-#include mult.s
-
-#endmain
+.endmain

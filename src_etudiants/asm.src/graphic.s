@@ -46,7 +46,7 @@
     call draw
 
     end: jump end
-#main
+.main
 clear_screen:
 	push r1
 	getctr a0 r1
@@ -285,4 +285,4 @@ draw_endloop:
     pop r2
     pop r1
     return 
-#endmain
+.endmain

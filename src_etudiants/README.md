@@ -80,3 +80,9 @@ ex : ``./simu -g -m bitmap/grlib.mem --stats asm.exec/graphic.obj | ./chart.py`
     architecture 32 ou 64 bits. Une modification de ce fichier entraine une
     recompilation du simulateur et des fichiers assembleurs. Cela permet d'être
     sur que le simulateur et les fichiers `.obj` sont compatibles.
+
+# Rendu Final #
+
+## L'assembleur ##
+  * Renommage des directive `#include`, `#main` et `#endmain` en `.include`,
+    `.main` et `.endmain`.

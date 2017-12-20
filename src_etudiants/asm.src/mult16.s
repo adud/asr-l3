@@ -10,7 +10,7 @@
 	call mult32
 end:	jump end
 
-#main
+.main
 	
 mult16:	push r4
 	push r5
@@ -117,4 +117,4 @@ sk2:
 	pop r7
 	return
 	
-#endmain
+.endmain

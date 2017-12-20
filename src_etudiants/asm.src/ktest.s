@@ -1,3 +1,5 @@
+.include aff.s	
+
 	leti r0 0x62000
 taper:	setctr a1 r0
 	leti r2 0
@@ -17,5 +19,3 @@ out:	add2i r2 93
 	call aff.s$putchar
 
 loop:	jump loop
-
-#include aff.s	
