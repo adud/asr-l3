@@ -17,7 +17,7 @@ src_etudiants/simu
 #plus besoin de conserver les compilations : l'assembleur marche
 asm.exec/
 simu.obj
-#./**/test.s
+#./**/test*.s
 
 
 *.html

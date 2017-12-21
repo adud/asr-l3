@@ -289,12 +289,13 @@ def preprocess(lines, baselabel="", make_dependencies=False, base_obj_file=""):
     include_expr = re.compile("^\.include\s+(?P<i_file>[^;\s]+)\s*($|;)")
     main_expr = re.compile("^\.main\s*($|;)")
     endmain_expr = re.compile("^\.endmain\s*($|;)")
+    const_expr = re.compile("^\.const\s+[^;\s]+\s+[^;\s]+\s*($|;)")
         
     final_lines = []
     files_to_include = [] # files are included at the end.
     for l in lines:
-        if l != "" and l[0] == ".":
-            # this line is a directive
+        if l != "" and l[0] == "." and not const_expr.match(l):
+            # this line is a directive other than a .const directive
             m = include_expr.match(l)
             if m is not None:
                 i_file = m.group("i_file")
@@ -306,7 +307,7 @@ def preprocess(lines, baselabel="", make_dependencies=False, base_obj_file=""):
                 # this directive is not valid
                 raise BaseException("Don't know what to do with : " + l)
         else:
-            if ";" in l: # remove the 
+            if ";" in l: # remove the commentaries
                 l = l[:l.find(";")]
             # split the line
             tokens = re.findall("[\S]+", l)
@@ -478,6 +479,10 @@ def asm_pass(iteration, lines):
             if opcode == "asr3" and token_count == 4:
                 instruction_encoding = "1111100 " + asm_reg(tokens[1]) + asm_reg(tokens[2]) + \
                                        asm_shiftval(tokens[3])
+            if opcode == ".const" and token_count == 3:
+                size = int(tokens[1], 0)
+                const = int(tokens[2], 0)
+                instruction_encoding = binary_repr(const, size)
             #end sabote
                     
             # If the line wasn't assembled:
