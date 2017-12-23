@@ -2,20 +2,26 @@
 	;; a virgule fixes
 	;; 16bits avant la virgule 16 bits apres
 
-	leti r1 0x5555
 	leti r0 3
 	call int2fix
-	call multfx
+	let r1 r0
+	leti r0 10
+	call int2fix
+	call divfix
+	leti r0 3
+	call int2fix
+	let r1 r0
 	let r0 r2
-	call fix2int
+	call multfix
+	
 loop:	jump loop
 	
 .main
 	
 .include mult16.s
 .include mult.s
-.include div.s
-
+.include doublediv.s
+	
 	;; fait passer r0 d'entier a virgule fixe
 	
 int2fix:
@@ -42,7 +48,7 @@ radix:
 	;; 
 	;; Philippe <3
 	;; pas de registre conserve
-multfx:
+multfix:
 	push r7
 	call mult16.s$mult32
 	shift left r2 16
@@ -51,8 +57,19 @@ multfx:
 	pop r7
 	return
 
-divfx:	return
-	
-
-
+	;; divise r0 par r1, pas de gestion de l'overflow
+	;; {r0=A,r1=B,r0*r1<2**16}
+	;; divfx
+	;; {r2=A/B}
+	;; aucun registre conserve
+divfix:	push r7
+	let r3 r1
+	leti r1 0
+	call doublediv.s$div2w
+	shift right r5 16
+	shift left r4 16
+	let r2 r5
+	add2 r2 r4
+	pop r7
+	return
 .endmain

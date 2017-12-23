@@ -47,7 +47,7 @@ shr2wb32:
 	shift right r3 1
 	shift right r2 1
 	jumpif nc esr2wb32
-	add2i r2 0x80000000
+	add2i r3 0x80000000
 esr2wb32:	
 	return
 	;; effectue la soustraction de r0@r1 par r2@r3
@@ -55,8 +55,10 @@ esr2wb32:
 	;; flags non-garantis
 	;; r4:7 conserves
 sub2w:	sub2 r1 r3
-	jumpif slt nxt
-	sub2i r0 1
+	jumpif c dia		
+	jumpif sgt nxt
+	jumpif z nxt
+dia:	sub2i r0 1
 nxt:	sub2 r0 r2
 	return
 
