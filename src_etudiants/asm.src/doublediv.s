@@ -55,10 +55,8 @@ esr2wb32:
 	;; flags non-garantis
 	;; r4:7 conserves
 sub2w:	sub2 r1 r3
-	jumpif c dia		
-	jumpif sgt nxt
-	jumpif z nxt
-dia:	sub2i r0 1
+	jumpif ge nxt
+	sub2i r0 1
 nxt:	sub2 r0 r2
 	return
 

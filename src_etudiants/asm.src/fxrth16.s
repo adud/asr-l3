@@ -5,14 +5,13 @@
 	leti r0 3
 	call int2fix
 	let r1 r0
-	leti r0 10
+	leti r0 1
 	call int2fix
 	call divfix
-	leti r0 3
+	leti r0 1
 	call int2fix
-	let r1 r0
-	let r0 r2
-	call multfix
+	let r1 r2
+	call divfix
 	
 loop:	jump loop
 	
@@ -65,6 +64,7 @@ multfix:
 divfix:	push r7
 	let r3 r1
 	leti r1 0
+	leti r2 0
 	call doublediv.s$div2w
 	shift right r5 16
 	shift left r4 16
