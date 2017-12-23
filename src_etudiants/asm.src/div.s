@@ -18,7 +18,7 @@ shiftl: ; on décale r3 vers la gauche jusqu'à que r3 soit plus grand que r0.
 	cmp r0 r3		;par boucle
 	jumpif ge shiftl
 mainloop:
-	shift right r3 1 ; par la suite, on décale r3 vers la droite à chaque tour
+	shift right r3 1 ; par la suite, on décale r3 vers la droite a chq tour
 	shift left r2 1	 ;inv : r0+r1*r2
 	cmp r0 r3	 ;inv : r0 < r3
 	jumpif lt cond	 ;nb bits lus <93
