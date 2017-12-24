@@ -89,8 +89,8 @@ int Processor::von_Neuman_step(bool debug) {
 		read_reg_from_pc(regnum2);
 		uop1=r[regnum1];
 		uop2=r[regnum2];
-		fullr = ((doubleword) uop1) + (~((doubleword) uop2)) + 1;
-		ur = uop1 + (~uop2) + 1;
+		fullr = ((doubleword) uop1) - ((doubleword) uop2);
+		ur = uop1 - uop2;
 		r[regnum1] = ur;
 		vflag = diff_overflow(uop1,uop2,ur);
 		manage_flags=true;
@@ -365,8 +365,8 @@ int Processor::von_Neuman_step(bool debug) {
 			read_reg_from_pc(regnum3);
 			uop1=r[regnum2];
 			uop2=r[regnum3];
-			fullr = ((doubleword) uop1)+(~((doubleword) uop2))+1;
-			ur = uop1 + (~uop2) + 1;
+			fullr = ((doubleword) uop1) - ((doubleword) uop2);
+			ur = uop1 - uop2;
 			r[regnum1] = ur;
 			vflag = diff_overflow(uop1,uop2,ur);
 			manage_flags=true;
@@ -377,7 +377,7 @@ int Processor::von_Neuman_step(bool debug) {
 			read_const_from_pc(constop,false);
 			uop1=r[regnum2];
 			uop2=constop;
-			fullr = ((doubleword) uop1)+ (~((doubleword) uop2))+1;
+			fullr = ((doubleword) uop1) - ((doubleword) uop2);
 			ur = uop1 - uop2;
 			r[regnum1] = ur;
 			vflag = diff_overflow(uop1,uop2,ur);
