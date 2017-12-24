@@ -797,7 +797,7 @@ char* opname(const int opcode)
 	return t[opflat(opcode)];
 }
 
-int idwru(int addr)
+int idwru(uint32_t addr)
 {
 	if(MEM_SCREEN_BEGIN <= addr
 	   && addr < MEM_SCREEN_END)
@@ -806,7 +806,7 @@ int idwru(int addr)
 		       
 }
 
-int idrru(int addr)
+int idrru(uint32_t addr)
 {
 	if(MEM_SCREEN_BEGIN <= addr
 	   && addr < MEM_SCREEN_END)

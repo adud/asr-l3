@@ -17,9 +17,9 @@ ASMDFILES = $(OBJFILES:%.obj=%.d)
 CONFIG = .config
 
 include $(CONFIG)
- 
+
 all : $(EXEC) $(OBJFILES)
-	
+
 $(EXEC) : $(OFILES)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
@@ -28,7 +28,7 @@ $(EXEC) : $(OFILES)
 
 $(SIMUOBJ)/%.o: $(SIMUSRC)/%.cpp $(CONFIG)
 	mkdir -p $(SIMUOBJ)
-	$(CXX) $(CFLAGS) -DWORDSIZE=$(WORDSIZE) -MMD -MP -o $@ -c $<
+	$(CXX) $(CFLAGS) -DWORDSIZE=$(WORDSIZE) -DINOUT=$(INOUT) -MMD -MP -o $@ -c $<
 
 $(ASMOBJ)/%.obj: $(ASMSRC)/%.s $(CONFIG)
 	mkdir -p $(ASMOBJ)

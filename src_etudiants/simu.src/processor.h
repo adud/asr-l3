@@ -91,9 +91,9 @@ int opsize(int opcode);
 //retourne la taille de l'opcode
 char* opname(int opcode);
 //retourne une chaine contenant le nom de l'operation de no opcode
-int idrru(int addr);
+int idrru(uint32_t addr);
 //determine quel est le type de memoire lu (pour les stats)
-int idwru(int addr);
+int idwru(uint32_t addr);
 //idem
 void printstats(char champ[][7],unsigned int *vals, int size);
 //affiche les stats d'un champ

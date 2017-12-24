@@ -14,21 +14,22 @@
 
 //decrit la position d'objets dans la memoire
 
-const int MEM_SCREEN_BEGIN = 0x10000;// -> 0x60000
-const int MEM_SCREEN_END = 0x60000;
-//de la place pour un aff ascii 0x60000 -> 0x62000
-const int MEM_KBD_BEGIN = 0x62000;
-const int MEM_KBD_END = 0x62080;
-//la reception du clavier 0x62000 -> 0x62080
-const int MEM_CLOCK_BEGIN = 0x62080;
-const int MEM_CLOCK_END = 0x620c0;
-//l'horloge : 0x62080 -> 0x620c0
+const uint32_t MEM_SCREEN_BEGIN = INOUT;// size : 0x50000
+const uint32_t MEM_SCREEN_END = MEM_SCREEN_BEGIN + 0x50000;
+//de la place pour un aff ascii : size : 0x2000
+const uint32_t MEM_KBD_BEGIN = MEM_SCREEN_END + 0x2000;
+const uint32_t MEM_KBD_END = MEM_KBD_BEGIN + 0x80;
+//la reception du clavier : size : 0x80
+const uint32_t MEM_CLOCK_BEGIN = MEM_KBD_END;
+const uint32_t MEM_CLOCK_END = MEM_CLOCK_BEGIN + 0x40;
+//l'horloge : size : 0x40
 //et on serre les dents pour la compatibilite
 //ca passe de justesse
 
-const int MEM_RGEN_BEGIN = 0x620c0;
-const int MEM_RGEN_END = 0x62100;
+const uint32_t MEM_RGEN_BEGIN = MEM_CLOCK_END;
+const uint32_t MEM_RGEN_END = MEM_RGEN_BEGIN + 0x40;
 //le generateur pseudo-aleatoire (Wolfram garanti non-lineaire rule 30)
+//size : 0x40
 
 const uint64_t MEMSIZE=1<<24; // please keep this a multiple of 64
 const int PC=0;
