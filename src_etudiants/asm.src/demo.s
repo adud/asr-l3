@@ -14,7 +14,7 @@
 	leti r0 0b0001110011100111
 	call graphic.s$clear_screen ; ainsi fut coloré l'écran d'un bleu profond...
 
-	leti r0 0x620c0
+	leti r0 0x62100
 	setctr a1 r0 ; ainsi fut aligné ce pointeur sur les mots...
 
 	leti r0 0x10000

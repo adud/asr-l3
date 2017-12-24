@@ -67,7 +67,9 @@ divfix:	push r7
 	leti r2 0
 	call doublediv.s$div2w
 	shift right r5 16
-	shift left r4 16
+	jumpif nc floor
+	add2i r5 1
+floor:	shift left r4 16
 	let r2 r5
 	add2 r2 r4
 	pop r7
