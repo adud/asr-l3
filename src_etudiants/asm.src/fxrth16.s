@@ -2,7 +2,7 @@
 	;; a virgule fixes
 	;; 16bits avant la virgule 16 bits apres
 
-	leti r0 3
+	leti r0 73
 	call int2fix
 	let r1 r0
 	leti r0 1
@@ -29,7 +29,7 @@ int2fix:
 
 	;; de virgule fixe a entier en arrondissant
 	
-fix2int:
+fix2int:	
 	shift right r0 16
 	jumpif nc end
 	add2i r0 1	
