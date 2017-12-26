@@ -1,15 +1,31 @@
-	leti r0 100
+	leti r0 500
+forloop:
+	push r0
 	call fxrth16.s$int2fix
 	call coords_square_dist
-
+	let r5 r1
+	let r1 r0
+	let r2 r0
+	let r3 r0
+	let r4 r0
+	add2 r3 r5
+	add2 r4 r5
+	leti r0 -1
+	call graphic.s$fill
+	leti r0 20
+	call pause
+	leti r0 0
+	call graphic.s$fill
+	pop r0
+	sub2i r0 1
+	jumpif nz forloop
+	
 loop:	jump loop
 	
 .main
 .include fxrth16.s
 .include mult.s
-	;; to avoid space loss (thx floflo)
-	;; 32 bits is for 2 points :
-	;; 8 bits per coordinate
+.include graphic.s 
 
 	;; coords_square_dist
 	
@@ -57,4 +73,28 @@ coords_square_dist:
 	call fxrth16.s$fix2int
 	pop r7
 	return
+
 .endmain
+
+pause:	push r1
+	push r2
+	push r3
+	push r4			;sauvegarde a1
+	getctr a1 r4
+	leti r3 0x62080
+	setctr a1 r3
+	readze a1 64 r1		;r1 := debut tps pause
+	setctr a1 r3
+
+lpi:
+	readze a1 64 r2
+	setctr a1 r3
+	sub2 r2 r1
+	cmp r2 r0
+	jumpif slt lpi
+	setctr a1 r4
+	pop r4
+	pop r3
+	pop r2
+	pop r1
+	return

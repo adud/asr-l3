@@ -73,7 +73,7 @@ cls_loop:
 
 plot:
     ; r0 contient la couleur du pixel que l'on va afficher
-    ; (r1, r2) contiennent les coordonées du pixel à afficher.
+    ; (r1, r2) contiennent les coordonnées du pixel à afficher.
     push r3
 
     ; r2 <- 127 - r2
@@ -98,6 +98,10 @@ plot:
     pop r3
     return
 fill:
+	;; affiche un rectangle
+	;; r0 contient la couleur que l'on va afficher
+	;; (r1,r2) (r3,r4) les coordonnées de deux coins
+	;; opposés du rectangle
     push r1
     push r2
     push r4
