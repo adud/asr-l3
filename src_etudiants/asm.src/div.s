@@ -14,9 +14,26 @@ div:	push r3
 	leti r2 0
 	let r3 r1
 shiftl: ; on décale r3 vers la gauche jusqu'à que r3 soit plus grand que r0.
-	shift left r3 1		;35bits
-	cmp r0 r3		;par boucle
+	shift left r3 1		
+	jumpif c depassement
+	cmp r0 r3
 	jumpif ge shiftl
+	jump mainloop
+depassement:
+	push r5		;avoir MSB dans r4 (indep arch)
+	push r4		;j'ai besoin de Macros		
+	leti r4 -1
+	leti r5 -1
+	shift right r4 1
+	xor3 r4 r5 r4
+	shift right r3 1
+	add2 r3 r4
+	pop r4
+	pop r5
+	
+	sub2 r0 r3
+	add2i r2 1
+	
 mainloop:
 	shift right r3 1 ; par la suite, on décale r3 vers la droite a chq tour
 	shift left r2 1	 ;inv : r0+r1*r2

@@ -2,6 +2,8 @@
 	;; si avant appel r0=A,r1=B, A*B < 2**16
 	;; apres appel r2=A*B
 	;; conservation des registres
+	;; si vous voulez etre efficace : mettez les petits
+	;; nombres dans r0 (cmplx O(log(|r0|)))
 	leti r0 0xa
 	leti r1 0xd
 	call mult

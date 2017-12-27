@@ -2,11 +2,8 @@
 	;; a virgule fixes
 	;; 16bits avant la virgule 16 bits apres
 
-	leti r0 73
-	call int2fix
-	let r1 r0
-	leti r0 1
-	call int2fix
+	leti r0 0x9c060000
+	leti r1 0x08000000
 	call divfix
 	leti r0 1
 	call int2fix
