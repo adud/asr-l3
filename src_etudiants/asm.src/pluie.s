@@ -1,24 +1,46 @@
-	leti r0 100
 	;; un petit test graphique
-
+	leti r0 0x2b0
+	call draw_background
+	leti r0 0x200
+	push r0
+	leti r2 0
+	leti r1 0
 forloop:
 	push r0
+	push r1
+	push r2
 	call fxrth16.s$int2fix
-	leti r1 0
-	leti r2 0
-
-	leti r3 0x3c0
-	call drawcube
-	;; call graphic.s$clear_screen
+	call calc_coords
+	push r5
+	push r6
+	leti r0 0x3c0
+	call draw_cube
+	leti r0 50
+	call attact.s$pause
 	
-	;; leti r0 10
-	;; call attact.s$pause
-	;; leti r0 0		
-	;; call graphic.s$clear_screen
-	;; leti r0 10
-	;; call attact.s$pause
+	pop r6
+	pop r5
+	leti r0 0
+	call draw_cube
+
+	leti r0 0x2b0
+	call draw_background
+	
+	pop r2
+	pop r1
 	pop r0
-	sub2i r0 0x1
+	sub2i r0 0x8
+	cmpi r0 -1
+	jumpif sgt forloop
+
+	pop r0
+	push r0
+	add2i r1 1
+	cmpi r1 3
+	jumpif nz forloop
+	leti r1 0
+	add2i r2 1
+	cmpi r2 3
 	jumpif nz forloop
 	
 loop:	jump loop
@@ -74,13 +96,19 @@ coords_square_dist:
 	pop r7
 	return
 
-	;; drawcube : if r0 contains the distance between cube & screen
+	;; calc_coords : if r0 contains the distance between cube & screen
 	;; r1 r2 its position on the screen
-	;; draws the cube with colour r3
+
+	;; after calc_coords :
 	
-drawcube:
+	;; r5 contains the coordinates :
+	;; dlf.x.e24 + dlb.x.e16 + dlf.y.e8 + dlb.y
+	;; where dlf is down left front
+	;; r6 contains the length of the squares :
+	;; front_square_length.e8 + back_square_length
+	
+calc_coords:
 	push r7
-	push r3			;colour
 	push r2			;cy
 	push r1			;cx
 	push r0			;d
@@ -112,15 +140,23 @@ drawcube:
 	call mult.s$mult
 	add2 r5 r2
 	add2 r5 r4
-	;; now r5 contains all the coordinates :
+	pop r7
+	return
+
+	
+	;; if r5 contains the coordinates :
 	;; dlf.x.e24 + dlb.x.e16 + dlf.y.e8 + dlb.y
 	;; where dlf is down left front
-	
-	;; r6 contains the length of the squares :
+	;; if r6 contains the length of the squares :
 	;; front_square_length.e8 + back_square_length
-	pop r0
-	
+	;;
+	;; draw_cube connects the squares ((dlf.x,dlf.y),front_square_length)
+	;; ((dlb.x,dlb.y),back_square_length) to form a prism
+
+draw_cube:	
+	push r7
 	push r6
+	add2i r5 0x11110101	;an offset used to center cubes
 	add2 r6 r5		;dl ul (down-left up-left)
 	call draw_3_vertices
 	let r5 r6
@@ -141,10 +177,8 @@ drawcube:
 	call draw_3_vertices
 
 	pop r7
-	return
-	
-	
 
+	return
 	
 	;; in draw_cube the 12 vertices are drawn by pack of 3
 	;; Draws the lines with the colour in r0
@@ -175,6 +209,40 @@ draw_3_vertices:
 	and3i r4 r6 0x000000ff
 	call graphic.s$draw
 
+	pop r7
+	return
+
+draw_background:
+	push r7
+	leti r1 0x11		;always an offset
+	leti r2 0x1		;to center the picture on the screen
+	let r3 r1
+	let r4 r2
+	leti r5 160
+	leti r6 128
+	sub3 r3 r5 r1
+	call graphic.s$draw
+	sub3 r4 r6 r2
+	call graphic.s$draw	;pourquoi pas ici mettre une boucle for 4
+	add2i r2 42 		;42 is K
+	sub2i r4 42
+	call graphic.s$draw
+	add2i r2 42 		;42 is K
+	sub2i r4 42
+	call graphic.s$draw
+	add2i r2 42 		;42 is K
+	sub2i r4 42
+	call graphic.s$draw
+
+	add2i r1 42
+	sub2i r3 42
+	call graphic.s$draw
+	add2i r1 42
+	sub2i r3 42
+	call graphic.s$draw
+	add2i r1 42
+	sub2i r3 42
+	
 	pop r7
 	return
 	
