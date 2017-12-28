@@ -26,11 +26,11 @@ intern_forloop: 		;the animation of one square
 	push r0
 	push r0
 	
-	leti r0 0x2b0
+	leti r0 0x3c0
 	call draw_background
 
 	pop r0			;distance du bloc en fix
-	leti r1 0x2b0
+	leti r1 0x3c0
 	call hvlines
 
 	pop r0			;distance du bloc en fix
@@ -247,7 +247,16 @@ draw_background:
 	leti r1 0x11		;always an offset
 	leti r2 0x1		;to center the picture on the screen
 	add3i r3 r1 126 	;3*K
-	add3i r4 r2 126
+	let r4 r2
+	call graphic.s$draw
+
+	sub2i r3 126
+	add2i r4 126
+	call graphic.s$draw
+	add2i r3 126
+	add2i r1 126
+	call graphic.s$draw
+	sub2i r1 126
 	
 	call graphic.s$draw
 	add2i r2 42 		;42 is K
@@ -265,65 +274,10 @@ draw_background:
 	call graphic.s$draw
 	sub2i r3 42
 	call graphic.s$draw
-	
+
 	pop r7
 	return
-
-draw_bg_hground:		;problem : makes the screen static
-	push r7
-	leti r1 0x11
-	leti r2 0x1
-	add3i r3 r1 126
-	let r4 r2
-	call graphic.s$draw
-	add2i r1 21
-	add2i r2 21
-	sub2i r3 21
-	add2i r4 21
-	call graphic.s$draw
-	add2i r1 21
-	add2i r2 21
-	sub2i r3 21
-	add2i r4 21
-	call graphic.s$draw
-	
-	pop r7
-	return
-
-draw_bg_vsides:
-	push r7
-	leti r1 0x11
-	leti r2 0x1
-	add3i r4 r2 126
-	let r3 r1
-	call graphic.s$draw
-	add2i r1 21
-	add2i r2 21
-	add2i r3 21
-	sub2i r4 21
-	call graphic.s$draw
-	add2i r1 21
-	add2i r2 21
-	add2i r3 21
-	sub2i r4 21
-	call graphic.s$draw
-	add2i r1 42
-	add2i r3 42
-	call graphic.s$draw
-	add2i r1 21
-	sub2i r2 21
-	add2i r3 21
-	add2i r4 21
-	call graphic.s$draw
-	add2i r1 21
-	sub2i r2 21
-	add2i r3 21
-	add2i r4 21
-	call graphic.s$draw
-	pop r7
-	return
-
-	;;better : implement moving horizontal & vertical lines
+	;; implement moving horizontal & vertical lines
 	;; if r0 contains a distance from screen
 	;; r1 a colour
 	;; draws lines on the walls & the ground at this distance
