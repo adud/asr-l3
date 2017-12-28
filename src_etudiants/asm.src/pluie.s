@@ -1,57 +1,77 @@
 	;; un petit test graphique
-	leti r0 0x2b0
-	call draw_background
+
+	leti r6 10
+
+extern_forloop:
+
+	push r6
+	leti r0 0x620c0 	;adress of the pseudo-random generator
+	setctr a0 r0		;ca faisait longtemps...
+	readze a0 32 r0
+	leti r1 9
+	call div.s$div
+
+	leti r1 3
+	call div.s$div
+
+	let r1 r0
 	leti r0 0x100
+intern_forloop: 		;the animation of one square
 	push r0
-	leti r2 0
-	leti r1 0
-forloop:
-	push r0
+	push r1
+	push r2
 	push r1
 	push r2
 	call fxrth16.s$int2fix
 	push r0
 	push r0
-	pop r0
+	
+	leti r0 0x2b0
+	call draw_background
+
+	pop r0			;distance du bloc en fix
+	leti r1 0x2b0
+	call hvlines
+
+	pop r0			;distance du bloc en fix
+
+	pop r1 			; cx du bloc
+	pop r2			; cy du bloc
+
+	push r0
 	call calc_coords
+
 	push r5
 	push r6
+
 	leti r0 0x3c0
+
 	call draw_cube
-	leti r0 50		
+
+	leti r0 30
 	call attact.s$pause
 	
 	pop r6
 	pop r5
+
 	leti r0 0
 	call draw_cube
-	
-	leti r0 0x2b0
-	call draw_background	
-	;; call draw_bg_hground
-	;; call draw_bg_vsides
 
-	pop r0
+	pop r0			;distance du bloc en fix
 	leti r1 0
 	call hvlines
-	
+
 	pop r2
 	pop r1
-	pop r0
-	sub2i r0 0x8
+	pop r0			;distance du bloc en INT
+	sub2i r0 8
 	cmpi r0 -1
-	jumpif sgt forloop
+	jumpif sgt intern_forloop
 
-	pop r0
-	push r0
-	add2i r1 1
-	cmpi r1 3
-	jumpif nz forloop
-	leti r1 0
-	add2i r2 1
-	cmpi r2 3
-	jumpif nz forloop
-	
+	pop r6
+	sub2i r6 1
+	jumpif nz extern_forloop
+		
 loop:	jump loop
 
 	
@@ -60,7 +80,8 @@ loop:	jump loop
 .include attact.s
 .include graphic.s
 .include mult.s
-
+.include div.s
+	
 	;; coords_square_dist
 	
 	;; if r0 contains the distance of the block
