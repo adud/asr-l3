@@ -1,7 +1,7 @@
 	;; un petit test graphique
 	leti r0 0x2b0
 	call draw_background
-	leti r0 0x200
+	leti r0 0x100
 	push r0
 	leti r2 0
 	leti r1 0
@@ -10,21 +10,30 @@ forloop:
 	push r1
 	push r2
 	call fxrth16.s$int2fix
+	push r0
+	push r0
+	pop r0
 	call calc_coords
 	push r5
 	push r6
 	leti r0 0x3c0
 	call draw_cube
-	leti r0 50
+	leti r0 50		
 	call attact.s$pause
 	
 	pop r6
 	pop r5
 	leti r0 0
 	call draw_cube
-
+	
 	leti r0 0x2b0
-	call draw_background
+	call draw_background	
+	;; call draw_bg_hground
+	;; call draw_bg_vsides
+
+	pop r0
+	leti r1 0
+	call hvlines
 	
 	pop r2
 	pop r1
@@ -112,7 +121,7 @@ calc_coords:
 	push r2			;cy
 	push r1			;cx
 	push r0			;d
-	call coords_square_dist
+	call coords_square_dist	
 	pop r4			;d
 	push r0			;b
 	push r1			;l
@@ -216,14 +225,10 @@ draw_background:
 	push r7
 	leti r1 0x11		;always an offset
 	leti r2 0x1		;to center the picture on the screen
-	let r3 r1
-	let r4 r2
-	leti r5 160
-	leti r6 128
-	sub3 r3 r5 r1
+	add3i r3 r1 126 	;3*K
+	add3i r4 r2 126
+	
 	call graphic.s$draw
-	sub3 r4 r6 r2
-	call graphic.s$draw	;pourquoi pas ici mettre une boucle for 4
 	add2i r2 42 		;42 is K
 	sub2i r4 42
 	call graphic.s$draw
@@ -233,17 +238,100 @@ draw_background:
 	add2i r2 42 		;42 is K
 	sub2i r4 42
 	call graphic.s$draw
-
-	add2i r1 42
+	add2i r1 63
+	sub2i r2 63
 	sub2i r3 42
 	call graphic.s$draw
-	add2i r1 42
 	sub2i r3 42
 	call graphic.s$draw
-	add2i r1 42
-	sub2i r3 42
 	
 	pop r7
 	return
+
+draw_bg_hground:		;problem : makes the screen static
+	push r7
+	leti r1 0x11
+	leti r2 0x1
+	add3i r3 r1 126
+	let r4 r2
+	call graphic.s$draw
+	add2i r1 21
+	add2i r2 21
+	sub2i r3 21
+	add2i r4 21
+	call graphic.s$draw
+	add2i r1 21
+	add2i r2 21
+	sub2i r3 21
+	add2i r4 21
+	call graphic.s$draw
 	
+	pop r7
+	return
+
+draw_bg_vsides:
+	push r7
+	leti r1 0x11
+	leti r2 0x1
+	add3i r4 r2 126
+	let r3 r1
+	call graphic.s$draw
+	add2i r1 21
+	add2i r2 21
+	add2i r3 21
+	sub2i r4 21
+	call graphic.s$draw
+	add2i r1 21
+	add2i r2 21
+	add2i r3 21
+	sub2i r4 21
+	call graphic.s$draw
+	add2i r1 42
+	add2i r3 42
+	call graphic.s$draw
+	add2i r1 21
+	sub2i r2 21
+	add2i r3 21
+	add2i r4 21
+	call graphic.s$draw
+	add2i r1 21
+	sub2i r2 21
+	add2i r3 21
+	add2i r4 21
+	call graphic.s$draw
+	pop r7
+	return
+
+	;;better : implement moving horizontal & vertical lines
+	;; if r0 contains a distance from screen
+	;; r1 a colour
+	;; draws lines on the walls & the ground at this distance
+
+	;; with the colour r1
+hvlines:
+	push r7
+	push r1
+	call coords_square_dist
+	let r2 r1
+	shift left r1 1
+	add3 r5 r1 r2 		;r5 contains 3*l
+	let r1 r0
+	pop r0
+	add3i r2 r1 1
+	add2i r1 17
+	let r3 r1
+	let r4 r2
+
+	add2 r4 r5
+	call graphic.s$draw
+	add2 r3 r5
+	add2 r1 r5
+	call graphic.s$draw
+
+	sub2 r3 r5
+	sub2 r4 r5
+	call graphic.s$draw
+
+	pop r7
+	return
 .endmain
