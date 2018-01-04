@@ -1,5 +1,5 @@
-	leti r0 0x620c0		
-	setctr a1 r0
+    call get_text
+	setctr a1 r6
 	leti r0 0x10000
 	setctr a0 r0
 	setctr sp r0		;initstack
@@ -20,8 +20,15 @@
 	
 loop:	jump loop
 
+get_text:
+    getctr pc r6
+    add2i r6 24
+    return
+.const "Bonjour"
+
 .main
 .include div.s
+.include bitmap.s
 	;; Ecrire un texte :
 	;; a0 pointe vers l'ecran (est le crayon)
 	;; a1 pointe vers le début de la chaine de car en memoire
@@ -103,9 +110,14 @@ prchr:	push r1
 	push r3
 	push r4
 	push r5
+    push r6
+    push r7
+    call bitmap.s$get_char_ptr ; r6 contient désormais le début du bitmap.
+    pop r7
 	getctr a1 r4		;r4 va juste conserver a1
 	shift left r1 3
-	add2i r1 0x60000
+	add2 r1 r6
+    pop r6 ; on n'a plus besoin du début du bitmap
 	setctr a1 r1
 	;; n'a plus besoin de r1
 

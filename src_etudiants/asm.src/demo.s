@@ -15,8 +15,8 @@
 	leti r0 0b0001110011100111
 	call graphic.s$clear_screen ; ainsi fut coloré l'écran d'un bleu profond...
 
-	leti r0 0x62100
-	setctr a1 r0 ; ainsi fut aligné ce pointeur sur les mots...
+    call get_text ; ainsi fut aligné ce pointeur sur les mots...
+    setctr a1 r6
 
 	leti r0 0x10000
 	setctr a0 r0 ; tandis que son ami regardait vers l'écran
@@ -83,3 +83,9 @@ loop:	leti r0 0
 	jumpif nz loop
 
 fin:	jump fin
+
+get_text:
+    getctr pc r6
+    add2i r6 24
+    return
+.const "Antonin et Alban sont fiers de vous presenter..."
