@@ -254,8 +254,8 @@ def include_file(i_file, baselabel):
 
     lines = get_lines(get_path(i_file))
     
-    main_expr = re.compile("^\.main\s*($|;)")
-    endmain_expr = re.compile("^\.endmain\s*($|;)")
+    main_expr = re.compile("^\s*\.main\s*($|;)")
+    endmain_expr = re.compile("^\s*\.endmain\s*($|;)")
 
     main_lines = [i for (i, l) in enumerate(lines)
                   if main_expr.match(l) is not None]
@@ -286,17 +286,18 @@ def preprocess(lines, baselabel="", make_dependencies=False, base_obj_file=""):
     """Apply the preprocesor operations to a list of lines.
     baselabel is the string that is added before every label."""
     # we assume that the user use neither ';' nor whitespace characters in
-    include_expr = re.compile("^\.include\s+(?P<i_file>[^;\s]+)\s*($|;)")
-    main_expr = re.compile("^\.main\s*($|;)")
-    endmain_expr = re.compile("^\.endmain\s*($|;)")
-    const_expr1 = re.compile("^\.const\s+[^;\s]+\s+[^;\s]+\s*($|;)")
-    const_expr2 = re.compile(r'\.const\s+".*[^\\]"\s*(;|$)')
+    directive_expr = re.compile("^\s*\.") # any directive
+    include_expr = re.compile("^\s*\.include\s+(?P<i_file>[^;\s]+)\s*($|;)")
+    main_expr = re.compile("^\s*\.main\s*($|;)")
+    endmain_expr = re.compile("^\s*\.endmain\s*($|;)")
+    const_expr1 = re.compile("^\s*\.const\s+[^;\s]+\s+[^;\s]+\s*($|;)")
+    const_expr2 = re.compile(r'^\s*\.const\s+".*[^\\]"\s*(;|$)')
         
     final_lines = []
     files_to_include = [] # files are included at the end.
     for l in lines:
-        if l != "" and l[0] == "." and not \
-           (const_expr1.match(l) or const_expr2.match(l)):
+        if directive_expr.match(l) and \
+           not (const_expr1.match(l) or const_expr2.match(l)):
             # this line is a directive other than a .const directive
             m = include_expr.match(l)
             if m is not None:
@@ -481,9 +482,9 @@ def asm_pass(iteration, lines):
                 instruction_encoding = "1111100 " + asm_reg(tokens[1]) + asm_reg(tokens[2]) + \
                                        asm_shiftval(tokens[3])
             if opcode == ".const":
-                const_expr1 = re.compile("\.const\s+(?P<n>[^;\s]+)\s+"
+                const_expr1 = re.compile("^\s*\.const\s+(?P<n>[^;\s]+)\s+"
                                          "(?P<val>[^;\s]+)\s*(;|$)")
-                const_expr2 = re.compile(r'\.const\s+(?P<str>".*[^\\]")\s*(;|$)')
+                const_expr2 = re.compile(r'^\s*\.const\s+(?P<str>".*[^\\]")\s*(;|$)')
                 m1 = const_expr1.match(source_line)
                 m2 = const_expr2.match(source_line)
                 if m1 is not None:
