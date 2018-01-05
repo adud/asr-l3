@@ -282,6 +282,9 @@ def include_file(i_file, baselabel):
 
         return preprocess(lines[main+1:endmain], baselabel, False, "")
 
+# This list stores all the recursively included files during the preprocessing
+# operation.
+recinc_files = []
 def preprocess(lines, baselabel="", make_dependencies=False, base_obj_file=""):
     """Apply the preprocesor operations to a list of lines.
     baselabel is the string that is added before every label."""
@@ -337,6 +340,7 @@ def preprocess(lines, baselabel="", make_dependencies=False, base_obj_file=""):
 
     for i_file in files_to_include:
         final_lines.extend(include_file(i_file, baselabel))
+        recinc_files.append(i_file)
 
     if verb>=VBMAX:
         print "After the preprocessing operation :"
@@ -345,10 +349,9 @@ def preprocess(lines, baselabel="", make_dependencies=False, base_obj_file=""):
 
     if make_dependencies:
         with open(base_obj_file + ".d", "w") as f:
-            path_to_include = [get_path(file) for file in files_to_include]
+            path_to_include = [get_path(file) for file in recinc_files]
             f.write(base_obj_file + ".obj" + ": " +
                     " ".join(path_to_include) + "\n\n")
-            # now, as the .s files are have no rules associated with,
 
     return final_lines
 
