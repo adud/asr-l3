@@ -307,6 +307,10 @@ hvlines:
 	sub2 r4 r5
 	call graphic.s$draw
 
+    add2 r2 r5
+    add2 r4 r5
+    call graphic.s$draw ; drawing the 4th line
+
 	pop r7
 	return
 .endmain
