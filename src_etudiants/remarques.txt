@@ -1,8 +1,8 @@
 ## Remarques ##
 
   * Pourquoi les sauts absolus sont-ils signés ?
-  * 4 pointeurs, dont 2 utilisables, c'est vraiment **très** peu, d'autant 
-qu'on pourrait utiliser les registres en ajoutant un bit à `readze`.
+  * 4 pointeurs, dont 2 utilisables, c'est vraiment **très** peu : typiquement, si je veux stocker un tableau en mémoire, j'aimerais bien simplement pouvoir mettre une constante dans mon pointeur, puis ensuite ajouter à mon pointeur une constante multipliée par un entier pour accéder à une case particulière du tableau. C'est déjà assez pénible de devoir rajouter des setctr et des getctr, mais ça devient clairement critique quand il s'agit de multiplier des matrices, car en plus il faut des push et des pop, associés à des setctr et getctr, pour pallier au manque de pointeurs.
+  D'autant qu'on pourrait utiliser les registres comme pointeur en ajoutant simplement un bit à `readze`.
 Seul problème : la pile, mais il suffirait d'ajouter une opérande `pop` qui
 ne serait plus du sucre syntaxique, et on pourrait à la rigueur supprimer
 `getctr` et `setctr`, qu'on utilise principalement pour  déplacer les
