@@ -1,10 +1,10 @@
 	;; un petit test graphique
 
-	leti r6 10
+	leti r7 0
 
 extern_forloop:
 
-	push r6
+	push r7
 	leti r0 0x620c0 	;adress of the pseudo-random generator
 	setctr a0 r0		;ca faisait longtemps...
 	readze a0 32 r0
@@ -64,13 +64,17 @@ intern_forloop: 		;the animation of one square
 	pop r2
 	pop r1
 	pop r0			;distance du bloc en INT
-	sub2i r0 8
+    pop r7
+	sub2i r0 8 ; normalement, on soustrait 8
+    sub2 r0 r7
+    push r7
 	cmpi r0 -1
 	jumpif sgt intern_forloop
 
-	pop r6
-	sub2i r6 1
-	jumpif nz extern_forloop
+	pop r7
+	add2i r7 1
+    cmpi r7 31
+	jumpif lt extern_forloop
 		
 loop:	jump loop
 
@@ -307,9 +311,9 @@ hvlines:
 	sub2 r4 r5
 	call graphic.s$draw
 
-    add2 r2 r5
-    add2 r4 r5
-    call graphic.s$draw ; drawing the 4th line
+    ;add2 r2 r5
+    ;add2 r4 r5
+    ;call graphic.s$draw ; drawing the 4th line
 
 	pop r7
 	return
