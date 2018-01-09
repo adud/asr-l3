@@ -48,7 +48,7 @@ intern_forloop: 		;the animation of one square
 
 	call draw_cube
 
-	leti r0 30
+	leti r0 60
 	call attact.s$pause
 	
 	pop r6
@@ -65,8 +65,8 @@ intern_forloop: 		;the animation of one square
 	pop r1
 	pop r0			;distance du bloc en INT
     pop r7
-	sub2i r0 8 ; normalement, on soustrait 8
-    sub2 r0 r7
+	sub2i r0 8 ; le vaisseau avance d'une distance 8 + r7 à chaque fois
+    sub2 r0 r7 ; ainsi, la vitesse augemente au fur et à mesure.
     push r7
 	cmpi r0 -1
 	jumpif sgt intern_forloop
@@ -263,21 +263,28 @@ draw_background:
 	sub2i r1 126
 	
 	call graphic.s$draw
-	add2i r2 42 		;42 is K
-	sub2i r4 42
-	call graphic.s$draw
-	add2i r2 42 		;42 is K
-	sub2i r4 42
-	call graphic.s$draw
-	add2i r2 42 		;42 is K
-	sub2i r4 42
+	;add2i r2 42 		;42 is K
+	;sub2i r4 42
+	;call graphic.s$draw
+	;add2i r2 42 		;42 is K
+	;sub2i r4 42
+	;call graphic.s$draw
+	;add2i r2 42 		;42 is K
+	;sub2i r4 42
+    add2i r2 63
+    sub2i r4 63
+    call graphic.s$draw
+    add2i r2 63
+    sub2i r4 63
 	call graphic.s$draw
 	add2i r1 63
 	sub2i r2 63
-	sub2i r3 42
-	call graphic.s$draw
-	sub2i r3 42
-	call graphic.s$draw
+	;sub2i r3 42
+	;call graphic.s$draw
+	;sub2i r3 42
+	;call graphic.s$draw
+    sub2i r3 63
+    call graphic.s$draw
 
 	pop r7
 	return
