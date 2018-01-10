@@ -18,48 +18,43 @@ extern_forloop:
 	leti r0 0x100
 intern_forloop: 		;the animation of one square
 	push r0
-	push r1
-	push r2
-	push r1
-	push r2
+	push r1 ; cx du bloc
+	push r2 ; cy du bloc
 	call fxrth16.s$int2fix
-	push r0
-	push r0
 	
+    ; on affiche un cube :
+	push r0 ; distance du bloc en fix
+	call calc_coords
+    pop r0
+	push r5
+	push r6
+    push r0
+    push r0
+	leti r0 0x3c0
+	call draw_cube
+
+    ; on affiche le décor
 	leti r0 0x3c0
 	call draw_background
 
+    ; on affiche le bloc
 	pop r0			;distance du bloc en fix
 	leti r1 0x3c0
 	call hvlines
 
-	pop r0			;distance du bloc en fix
-
-	pop r1 			; cx du bloc
-	pop r2			; cy du bloc
-
-	push r0
-	call calc_coords
-
-	push r5
-	push r6
-
-	leti r0 0x3c0
-
-	call draw_cube
-
 	leti r0 60
 	call attact.s$pause
 	
-	pop r6
-	pop r5
-
-	leti r0 0
-	call draw_cube
-
+    ; on efface le cube
 	pop r0			;distance du bloc en fix
 	leti r1 0
 	call hvlines
+
+    ; on efface le bloc
+	pop r6
+	pop r5
+	leti r0 0
+	call draw_cube
 
 	pop r2
 	pop r1
