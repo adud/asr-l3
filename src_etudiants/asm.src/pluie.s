@@ -1,10 +1,10 @@
 	;; un petit test graphique
 
-	leti r6 10
+	leti r7 0
 
 extern_forloop:
 
-	push r6
+	push r7
 	leti r0 0x620c0 	;adress of the pseudo-random generator
 	setctr a0 r0		;ca faisait longtemps...
 	readze a0 32 r0
@@ -18,59 +18,58 @@ extern_forloop:
 	leti r0 0x100
 intern_forloop: 		;the animation of one square
 	push r0
-	push r1
-	push r2
-	push r1
-	push r2
+	push r1 ; cx du bloc
+	push r2 ; cy du bloc
 	call fxrth16.s$int2fix
-	push r0
-	push r0
 	
+    ; on affiche un cube :
+	push r0 ; distance du bloc en fix
+	call calc_coords
+    pop r0
+	push r5
+	push r6
+    push r0
+    push r0
+	leti r0 0x3c0
+	call draw_cube
+
+    ; on affiche le décor
 	leti r0 0x3c0
 	call draw_background
 
+    ; on affiche le bloc
 	pop r0			;distance du bloc en fix
 	leti r1 0x3c0
 	call hvlines
 
-	pop r0			;distance du bloc en fix
-
-	pop r1 			; cx du bloc
-	pop r2			; cy du bloc
-
-	push r0
-	call calc_coords
-
-	push r5
-	push r6
-
-	leti r0 0x3c0
-
-	call draw_cube
-
-	leti r0 30
+	leti r0 60
 	call attact.s$pause
 	
-	pop r6
-	pop r5
-
-	leti r0 0
-	call draw_cube
-
+    ; on efface le cube
 	pop r0			;distance du bloc en fix
 	leti r1 0
 	call hvlines
 
+    ; on efface le bloc
+	pop r6
+	pop r5
+	leti r0 0
+	call draw_cube
+
 	pop r2
 	pop r1
 	pop r0			;distance du bloc en INT
-	sub2i r0 8
+    pop r7
+	sub2i r0 8 ; le vaisseau avance d'une distance 8 + r7 à chaque fois
+    sub2 r0 r7 ; ainsi, la vitesse augemente au fur et à mesure.
+    push r7
 	cmpi r0 -1
 	jumpif sgt intern_forloop
 
-	pop r6
-	sub2i r6 1
-	jumpif nz extern_forloop
+	pop r7
+	add2i r7 1
+    cmpi r7 31
+	jumpif lt extern_forloop
 		
 loop:	jump loop
 
@@ -259,21 +258,28 @@ draw_background:
 	sub2i r1 126
 	
 	call graphic.s$draw
-	add2i r2 42 		;42 is K
-	sub2i r4 42
-	call graphic.s$draw
-	add2i r2 42 		;42 is K
-	sub2i r4 42
-	call graphic.s$draw
-	add2i r2 42 		;42 is K
-	sub2i r4 42
+	;add2i r2 42 		;42 is K
+	;sub2i r4 42
+	;call graphic.s$draw
+	;add2i r2 42 		;42 is K
+	;sub2i r4 42
+	;call graphic.s$draw
+	;add2i r2 42 		;42 is K
+	;sub2i r4 42
+    add2i r2 63
+    sub2i r4 63
+    call graphic.s$draw
+    add2i r2 63
+    sub2i r4 63
 	call graphic.s$draw
 	add2i r1 63
 	sub2i r2 63
-	sub2i r3 42
-	call graphic.s$draw
-	sub2i r3 42
-	call graphic.s$draw
+	;sub2i r3 42
+	;call graphic.s$draw
+	;sub2i r3 42
+	;call graphic.s$draw
+    sub2i r3 63
+    call graphic.s$draw
 
 	pop r7
 	return
@@ -306,6 +312,10 @@ hvlines:
 	sub2 r3 r5
 	sub2 r4 r5
 	call graphic.s$draw
+
+    ;add2 r2 r5
+    ;add2 r4 r5
+    ;call graphic.s$draw ; drawing the 4th line
 
 	pop r7
 	return
