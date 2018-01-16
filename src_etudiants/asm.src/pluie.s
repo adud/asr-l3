@@ -2,7 +2,7 @@
 
 	leti r7 0 ; le nombre de blocs qui ont fini de passer
     leti r3 1 ; la ligne à laquelle est affichée le X-wing
-    leti r4 0 ; la colonne à laquelle est affichée le X-wing
+    leti r4 1 ; la colonne à laquelle est affichée le X-wing
 
 extern_forloop:
 
@@ -420,10 +420,33 @@ move_left:
     sub2i r3 1
     jump return
 move_down:
+    call cancel_last_read_bit
+    cmpi r4 0
+    jumpif eq return
+    leti r0 0
+    push r3
+    push r4
+    call x-wing.s$draw_xwing
+    pop r4
+    pop r3
+    sub2i r4 1
     jump return
 move_up:
+    call cancel_last_read_bit
+    cmpi r4 2
+    jumpif eq return
+    leti r0 0
+    push r3
+    push r4
+    call x-wing.s$draw_xwing
+    pop r4
+    pop r3
+    add2i r4 1
     jump return
 
+; effacement du dernier bit lu avec le compteur a1. Cela permet qu'une fois
+; que l'on a vu qu'une touche du clavier avait été préssée, on met le bit
+; correspondant un mémoire à 0 de façon à ne pas relire la même entrée.
 cancel_last_read_bit:
     getctr a1 r0
     sub2i r0 1
