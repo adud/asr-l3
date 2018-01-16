@@ -396,6 +396,7 @@ return:
     return
 
 move_right:
+    call cancel_last_read_bit
     cmpi r3 2
     jumpif eq return ; si le X-wing se trouve déjà à droite, on ne le bouge pas
     leti r0 0
@@ -407,6 +408,7 @@ move_right:
     add2i r3 1               ; et on change sa coordonée
     jump return
 move_left:
+    call cancel_last_read_bit
     cmpi r3 0
     jumpif eq return
     leti r0 0
@@ -421,4 +423,13 @@ move_down:
     jump return
 move_up:
     jump return
+
+cancel_last_read_bit:
+    getctr a1 r0
+    sub2i r0 1
+    setctr a1 r0
+    leti r0 0
+    write a1 1 r0
+    return
+
 .endmain
