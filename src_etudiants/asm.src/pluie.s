@@ -1,6 +1,8 @@
 	;; un petit test graphique
 
-	leti r7 0
+	leti r7 0 ; le nombre de blocs qui ont fini de passer
+    leti r3 1 ; la ligne à laquelle est affichée le X-wing
+    leti r4 0 ; la colonne à laquelle est affichée le X-wing
 
 extern_forloop:
 
@@ -24,38 +26,65 @@ intern_forloop: 		;the animation of one square
 	
     ; on affiche un cube :
 	push r0 ; distance du bloc en fix
+    push r3
+    push r4
 	call calc_coords
+    pop r4
+    pop r3
     pop r0
 	push r5
 	push r6
     push r0
+    push r3
+    push r4
     push r0
-	leti r0 0x3c0
+	leti r0 0b11100000
 	call draw_cube
 
     ; on affiche le décor
-	leti r0 0x3c0
+	leti r0 0b11100000
 	call draw_background
 
     ; on affiche le bloc
 	pop r0			;distance du bloc en fix
-	leti r1 0x3c0
+	leti r1 0b11100000
 	call hvlines
+
+    ; on affiche le X-wing
+    pop r4
+    pop r3
+    leti r0 0b111100000
+    call calc_xwing_coords
+    push r3
+    push r4
+    call x-wing.s$draw_xwing
 
 	leti r0 60
 	call attact.s$pause
 	
+    pop r4
+    pop r3
+    call react_key
+
     ; on efface le cube
 	pop r0			;distance du bloc en fix
+    push r3
+    push r4
 	leti r1 0
 	call hvlines
 
     ; on efface le bloc
+    pop r4
+    pop r3
 	pop r6
 	pop r5
+    push r3
+    push r4
 	leti r0 0
 	call draw_cube
 
+    pop r4
+    pop r3
 	pop r2
 	pop r1
 	pop r0			;distance du bloc en INT
@@ -80,6 +109,7 @@ loop:	jump loop
 .include graphic.s
 .include mult.s
 .include div.s
+.include x-wing.s
 	
 	;; coords_square_dist
 	
@@ -319,4 +349,76 @@ hvlines:
 
 	pop r7
 	return
+
+calc_xwing_coords:
+    ; r1 <- 43 * r3 + 17
+    let r1 r3
+    shift left r1 2
+    add2 r1 r3
+    shift left r1 2
+    add2 r1 r3
+    shift left r1 1
+    add2 r1 r3
+    add2i r1 17
+    ; r2 <- 43 * r4 + 27
+    let r2 r4
+    shift left r2 2
+    add2 r2 r4
+    shift left r2 2
+    add2 r2 r4
+    shift left r2 1
+    add2 r2 r4
+    add2i r2 27
+    return
+
+; On regarde si une touche du clavier a été préssée.
+; Si oui, on efface le X-wing et on change ses coordonnées.
+react_key: 
+    push r7
+    ; on court-circuite tout :
+    leti r0 0x6204f ; l'adresse du bit activé si on presse la touche droite
+    setctr a1 r0
+    readze a1 1 r0
+    cmpi r0 1
+    jumpif eq move_right
+    readze a1 1 r0
+    cmpi r0 1
+    jumpif eq move_left
+    readze a1 1 r0
+    cmpi r0 1
+    jumpif eq move_down
+    readze a1 1 r0
+    cmpi r0 1
+    jumpif eq move_up
+    ; aucune touche directionnelle n'a été préssée :
+return:
+    pop r7
+    return
+
+move_right:
+    cmpi r3 2
+    jumpif eq return ; si le X-wing se trouve déjà à droite, on ne le bouge pas
+    leti r0 0
+    push r3
+    push r4
+    call x-wing.s$draw_xwing ; on efface le X-wing
+    pop r4
+    pop r3
+    add2i r3 1               ; et on change sa coordonée
+    jump return
+move_left:
+    cmpi r3 0
+    jumpif eq return
+    leti r0 0
+    push r3
+    push r4
+    call x-wing.s$draw_xwing
+    pop r4
+    pop r3
+    sub2i r3 1
+    jump return
+move_down:
+    jump return
+move_up:
+    jump return
 .endmain
