@@ -53,6 +53,7 @@ intern_forloop: 		;the animation of one square
     ; on affiche le X-wing
     pop r4
     pop r3
+    call react_key
     leti r0 0b111100000
     call calc_xwing_coords
     push r3
@@ -62,11 +63,9 @@ intern_forloop: 		;the animation of one square
 	leti r0 60
 	call attact.s$pause
 	
+    ; on efface le cube
     pop r4
     pop r3
-    call react_key
-
-    ; on efface le cube
 	pop r0			;distance du bloc en fix
     push r3
     push r4
@@ -400,6 +399,7 @@ move_right:
     cmpi r3 2
     jumpif eq return ; si le X-wing se trouve déjà à droite, on ne le bouge pas
     leti r0 0
+    call calc_xwing_coords
     push r3
     push r4
     call x-wing.s$draw_xwing ; on efface le X-wing
@@ -412,6 +412,7 @@ move_left:
     cmpi r3 0
     jumpif eq return
     leti r0 0
+    call calc_xwing_coords
     push r3
     push r4
     call x-wing.s$draw_xwing
@@ -424,6 +425,7 @@ move_down:
     cmpi r4 0
     jumpif eq return
     leti r0 0
+    call calc_xwing_coords
     push r3
     push r4
     call x-wing.s$draw_xwing
@@ -436,6 +438,7 @@ move_up:
     cmpi r4 2
     jumpif eq return
     leti r0 0
+    call calc_xwing_coords
     push r3
     push r4
     call x-wing.s$draw_xwing
