@@ -60,7 +60,7 @@ intern_forloop: 		;the animation of one square
     push r4
     call x-wing.s$draw_xwing
 
-	leti r0 60
+	leti r0 50
 	call attact.s$pause
 	
     ; on efface le cube
@@ -96,10 +96,17 @@ intern_forloop: 		;the animation of one square
 
 	pop r7
 	add2i r7 1
-    cmpi r7 31
-	jumpif lt extern_forloop
-		
-loop:	jump loop
+    cmpi r7 30 ; on s'arrête au bout de 30 blocs
+	jumpif ge endloop
+    ; si (r1, r2) ≠ (r3, r4), on rentre en collision avec le bloc et c'est
+    ; la fin du jeu.
+    cmp r1 r3
+    jumpif neq endloop
+    cmp r2 r4
+    jumpif neq endloop
+    jump extern_forloop
+    
+endloop:    jump endloop
 
 	
 .main
