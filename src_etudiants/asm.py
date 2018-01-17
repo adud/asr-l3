@@ -542,25 +542,39 @@ if __name__ == '__main__':
                            help="generate a file containing dependencies",
                            action="store_true")
     argparser.add_argument('-o', '--outfile')
+    argparser.add_argument('-opp', '--only_preprocess', action="store_true",
+                           help="only preprocess the file")
+    argparser.add_argument('-npp', '--no_preprocess', action="store_true",
+                           help="bypass the preprocess")
     options=argparser.parse_args()
     filename = options.filename
     WORDSIZE = options.architecture
     verb = options.verbose
     make_dependencies = options.make_dependencies
     if options.outfile is None:
+        oext = ".e" if options.only_preprocess else ".obj" 
         basefilename, extension = os.path.splitext(filename)
-        obj_file = basefilename+".obj"
+        obj_file = basefilename+oext
         base_obj_file = basefilename
     else:
         base_obj_file, extension = os.path.splitext(options.outfile)
         obj_file = options.outfile
 
     print make_dependencies
-    lines = preprocess(get_lines(filename), "", make_dependencies,
-                       base_obj_file)
-    for i in range(1, nb_iterations + 1):
-        code = asm_pass(i, lines)
-    
+
+    print options.no_preprocess
+    if not options.no_preprocess:
+        lines = preprocess(get_lines(filename), "", make_dependencies,
+                           base_obj_file)
+    else:
+        lines = get_lines(filename)
+
+    if not options.only_preprocess:
+        for i in range(1, nb_iterations + 1):
+            code = asm_pass(i, lines)
+    else:
+        code = lines
+            
     # statistics
     
     outfile = open(obj_file, "w")
