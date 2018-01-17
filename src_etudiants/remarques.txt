@@ -17,7 +17,7 @@ des problèmes sur, à tout hasard, FAT32, ou pire : FAT16.
     en deux opérations avec un `leti` suivi d'un `sub2` ou `sub3` (ce qui nous
     oblige à utiliser un registre supplémentaire), ou seulement dans des cas
     particuliers de le faire en une opération avec `xor3i`.
-
+  * Mapper l'écran sur 0x10000 nous oblige à des codes de moins de 64 kio, ce qui peut s'avérer assez problématique pour stocker, par exemple un fond d'écran de 320 kio, surtout quand on propose 16 Mio de mémoire.
 ## Sur l'optimisation des échanges ##
 
    * De manière générale, on lit beaucoup plus que l'on n'écrit.
