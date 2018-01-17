@@ -16,9 +16,11 @@ ASMDFILES = $(OBJFILES:%.obj=%.d)
 # the configuration file, defining the WORDSIZE variable
 CONFIG = .config
 
+GRAPH = $(ASMSRC)/pictr2.s
+
 include $(CONFIG)
 
-all : $(EXEC) $(OBJFILES)
+all : $(EXEC) $(OBJFILES) $(GRAPH)
 
 $(EXEC) : $(OFILES)
 	$(CXX) -o $@ $^ $(LDFLAGS)
@@ -34,6 +36,8 @@ $(ASMOBJ)/%.obj: $(ASMSRC)/%.s $(CONFIG)
 	mkdir -p $(ASMOBJ)
 	python2 asm.py -a $(WORDSIZE) -MD -v 1 $< -o $@
 
+$(GRAPH): bitmap/r2.jpg
+	cd bitmap && ./genr2.sh
 r2: all
 	./simu -g -m bitmap/grlib.mem asm.exec/demo.obj
 
@@ -41,7 +45,7 @@ rf: all # exécute le rendu final
 	./simu -g asm.exec/pluie.obj
 
 clean :
-	$(RM) $(OFILES) $(DFILES) $(OBJFILES) $(ASMDFILES)
+	$(RM) $(OFILES) $(DFILES) $(OBJFILES) $(ASMDFILES) $(GRAPH) 
 cleaner : clean
 	$(RM) $(EXEC)
 

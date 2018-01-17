@@ -13,7 +13,7 @@ flipflop/*.pdf
 #le DM
 #src : fichiers de compilation
 src_etudiants/simu
-
+src_etudiant/asm.src/pictr2.s
 #plus besoin de conserver les compilations : l'assembleur marche
 asm.exec/
 simu.obj
