@@ -560,7 +560,8 @@ if __name__ == '__main__':
         base_obj_file, extension = os.path.splitext(options.outfile)
         obj_file = options.outfile
 
-    print make_dependencies
+    if make_dependencies:
+        print("making dependencies...")
 
     print options.no_preprocess
     if not options.no_preprocess:
