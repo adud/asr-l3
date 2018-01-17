@@ -17,7 +17,7 @@ extern_forloop:
 	call div.s$div
 
 	let r1 r0
-	leti r0 0x100
+	leti r0 0x140
 intern_forloop: 		;the animation of one square
 	push r0
 	push r1 ; cx du bloc
