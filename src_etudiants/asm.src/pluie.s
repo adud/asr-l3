@@ -1,4 +1,4 @@
-	;; un petit test graphique
+	;; un petit test graphique 
 
 	leti r7 0 ; le nombre de blocs qui ont fini de passer
     leti r3 1 ; la ligne à laquelle est affichée le X-wing
@@ -25,23 +25,25 @@ intern_forloop: 		;the animation of one square
 	push r2 ; cy du bloc
 	call fxrth16.s$int2fix
 	
-    ; on affiche un cube :
+	;; dessin du cube
 	push r0 ; distance du bloc en fix
 	push r3	; cY du X-wing 
 	push r4	; cX du Y-wing
+	
 	call calc_coords
+
 	pop r4			; cX du Y-wing
 	pop r3			; cY du X-wing
 	pop r0			; distance du bloc en fix
 	push r5			; coords des coins bas gauche du cube
 	push r6			; longueur des deux carres du cube
-	
 	push r0			; distance du bloc en fix
 	push r3			; cY du X-Wing
 	push r4			; cX du Y-Wing
 	push r0			; distance du bloc en fix
+	
 	leti r0 0b11100000	; vert pale
-	call draw_cube			
+	call draw_cube		
 
     ; on affiche le décor
 	leti r0 0b11100000	; vert pale
@@ -53,34 +55,41 @@ intern_forloop: 		;the animation of one square
 	call hvlines
 
     ; on affiche le X-wing
-    pop r4			; cX du X-Wing
-    pop r3			; cY du X-Wing
-    call react_key
-    leti r0 0b111100000		; vert flash
-    call calc_xwing_coords	
+	pop r4			; cX du X-Wing
+	pop r3			; cY du X-Wing
+	
+   	call react_key
+	leti r0 0b111100000		; vert flash
+	call calc_xwing_coords
+	
     push r3	 		; nvelles cY du X-Wing
     push r4			; nvelles cX du X-Wing
-    call x-wing.s$draw_xwing
 
+	call x-wing.s$draw_xwing
+
+	;; pause utilisateur
 	leti r0 50
 	call attact.s$pause
 	
     ; on efface le cube
-    pop r4			; cX du X-Wing
-    pop r3			; cY du X-Wing
+	pop r4			; cX du X-Wing
+	pop r3			; cY du X-Wing
 	pop r0			; distance du bloc en fix
-    push r3			; cY du X-Wing
-    push r4			; cX du X-Wing
+	push r3			; cY du X-Wing
+	push r4			; cX du X-Wing
+
+	
 	leti r1 0		; Noir
 	call hvlines		; effacer les lignes
 
-    ; on efface le bloc
-    pop r4			; cX du X-Wing
-    pop r3			; cY du X-Wing
+	    ; on efface le bloc
+	pop r4			; cX du X-Wing
+	pop r3			; cY du X-Wing
 	pop r6			; longueur des carres du cube
 	pop r5			; coords des coins bas gauche
-    push r3			; cY du X-Wing
-    push r4			; cX du X-Wing
+	push r3			; cY du X-Wing
+	push r4			; cX du X-Wing
+	
 	leti r0 0		; Noir
 	call draw_cube		; efface le cube
 
@@ -101,7 +110,7 @@ intern_forloop: 		;the animation of one square
 	add2i r7 1
     cmpi r7 30 ; on s'arrête au bout de 30 blocs
 	jumpif ge endloop
-    ; si (r1, r2) ≠ (r3, r4), on rentre en collision avec le bloc et c'est
+    ; si (r1, r2) != (r3, r4), on rentre en collision avec le bloc et c'est
     ; la fin du jeu.
     cmp r1 r3
     jumpif neq endloop
@@ -382,6 +391,12 @@ calc_xwing_coords:
 
 ; On regarde si une touche du clavier a été préssée.
 ; Si oui, on efface le X-wing et on change ses coordonnées.
+	;; si r3 r4 contiennent les coordonnees cx et cy
+	;; du X-Wing, les met a jour en fonction de
+	;; la touche pressee
+	;; redessine le X-Wing SSI il a bouge
+	;; registres 5-6 conserves
+
 react_key: 
     push r7
     ; on court-circuite tout :
@@ -400,14 +415,14 @@ react_key:
     cmpi r0 1
     jumpif eq move_up
     ; aucune touche directionnelle n'a été préssée :
-return:
+break:
     pop r7
     return
 
 move_right:
     call cancel_last_read_bit
     cmpi r3 2
-    jumpif eq return ; si le X-wing se trouve déjà à droite, on ne le bouge pas
+    jumpif eq break ; si le X-wing se trouve déjà à droite, on ne le bouge pas
     leti r0 0
     call calc_xwing_coords
     push r3
@@ -416,11 +431,11 @@ move_right:
     pop r4
     pop r3
     add2i r3 1               ; et on change sa coordonée
-    jump return
+    jump break
 move_left:
     call cancel_last_read_bit
     cmpi r3 0
-    jumpif eq return
+    jumpif eq break
     leti r0 0
     call calc_xwing_coords
     push r3
@@ -429,11 +444,11 @@ move_left:
     pop r4
     pop r3
     sub2i r3 1
-    jump return
+    jump break
 move_down:
     call cancel_last_read_bit
     cmpi r4 0
-    jumpif eq return
+    jumpif eq break
     leti r0 0
     call calc_xwing_coords
     push r3
@@ -442,11 +457,11 @@ move_down:
     pop r4
     pop r3
     sub2i r4 1
-    jump return
+    jump break
 move_up:
     call cancel_last_read_bit
     cmpi r4 2
-    jumpif eq return
+    jumpif eq break
     leti r0 0
     call calc_xwing_coords
     push r3
@@ -455,11 +470,13 @@ move_up:
     pop r4
     pop r3
     add2i r4 1
-    jump return
+    jump break
 
 ; effacement du dernier bit lu avec le compteur a1. Cela permet qu'une fois
 ; que l'on a vu qu'une touche du clavier avait été préssée, on met le bit
 ; correspondant un mémoire à 0 de façon à ne pas relire la même entrée.
+	;; conservation des registres r1-6
+	;; et de tous les pointeurs
 cancel_last_read_bit:
     getctr a1 r0
     sub2i r0 1
