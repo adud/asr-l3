@@ -16,11 +16,9 @@ ASMDFILES = $(OBJFILES:%.obj=%.d)
 # the configuration file, defining the WORDSIZE variable
 CONFIG = .config
 
-GRAPH = $(ASMSRC)/pictr2.s
-
 include $(CONFIG)
 
-all : $(EXEC) $(OBJFILES) $(GRAPH)
+all : $(EXEC) $(OBJFILES)
 
 $(EXEC) : $(OFILES)
 	$(CXX) -o $@ $^ $(LDFLAGS)
@@ -45,7 +43,8 @@ rf: all # exécute le rendu final
 	./simu -g asm.exec/pluie.obj
 
 clean :
-	$(RM) $(OFILES) $(DFILES) $(OBJFILES) $(ASMDFILES) $(GRAPH) 
+	$(RM) $(OFILES) $(DFILES) $(OBJFILES) $(ASMDFILES)
 cleaner : clean
 	$(RM) $(EXEC)
+	rmdir $(SIMUOBJ) $(ASMOBJ)
 
