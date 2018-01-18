@@ -1,2 +1,5 @@
 # À faire
-	des stats
+	* des stats
+
+# Réparez-moi !
+	* Multiples insertions de code possibles

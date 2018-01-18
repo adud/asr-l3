@@ -6,95 +6,98 @@
 
 extern_forloop:
 
-	push r7
-	leti r0 0x620c0 	;adress of the pseudo-random generator
-	setctr a0 r0		;ca faisait longtemps...
+	push r7			;nombre de blocs deja passes
+	leti r0 0x620c0 	;adresse d'un pseudo-aleatoire
+	setctr a0 r0	
 	readze a0 32 r0
 	leti r1 9
 	call div.s$div
 
 	leti r1 3
-	call div.s$div
+	call div.s$div		; r0,r2 = coords bloc
 
 	let r1 r0
-	leti r0 0x140
+	leti r0 0x140		;distance du bloc en int
+	
 intern_forloop: 		;the animation of one square
-	push r0
+	push r0			;distance du bloc en int
 	push r1 ; cx du bloc
 	push r2 ; cy du bloc
 	call fxrth16.s$int2fix
 	
     ; on affiche un cube :
 	push r0 ; distance du bloc en fix
-    push r3
-    push r4
+	push r3	; cY du X-wing 
+	push r4	; cX du Y-wing
 	call calc_coords
-    pop r4
-    pop r3
-    pop r0
-	push r5
-	push r6
-    push r0
-    push r3
-    push r4
-    push r0
-	leti r0 0b11100000
-	call draw_cube
+	pop r4			; cX du Y-wing
+	pop r3			; cY du X-wing
+	pop r0			; distance du bloc en fix
+	push r5			; coords des coins bas gauche du cube
+	push r6			; longueur des deux carres du cube
+	
+	push r0			; distance du bloc en fix
+	push r3			; cY du X-Wing
+	push r4			; cX du Y-Wing
+	push r0			; distance du bloc en fix
+	leti r0 0b11100000	; vert pale
+	call draw_cube			
 
     ; on affiche le décor
-	leti r0 0b11100000
+	leti r0 0b11100000	; vert pale
 	call draw_background
 
     ; on affiche le bloc
-	pop r0			;distance du bloc en fix
-	leti r1 0b11100000
+	pop r0			; distance du bloc en fix
+	leti r1 0b11100000	; vert pale
 	call hvlines
 
     ; on affiche le X-wing
-    pop r4
-    pop r3
+    pop r4			; cX du X-Wing
+    pop r3			; cY du X-Wing
     call react_key
-    leti r0 0b111100000
-    call calc_xwing_coords
-    push r3
-    push r4
+    leti r0 0b111100000		; vert flash
+    call calc_xwing_coords	
+    push r3	 		; nvelles cY du X-Wing
+    push r4			; nvelles cX du X-Wing
     call x-wing.s$draw_xwing
 
 	leti r0 50
 	call attact.s$pause
 	
     ; on efface le cube
-    pop r4
-    pop r3
-	pop r0			;distance du bloc en fix
-    push r3
-    push r4
-	leti r1 0
-	call hvlines
+    pop r4			; cX du X-Wing
+    pop r3			; cY du X-Wing
+	pop r0			; distance du bloc en fix
+    push r3			; cY du X-Wing
+    push r4			; cX du X-Wing
+	leti r1 0		; Noir
+	call hvlines		; effacer les lignes
 
     ; on efface le bloc
-    pop r4
-    pop r3
-	pop r6
-	pop r5
-    push r3
-    push r4
-	leti r0 0
-	call draw_cube
+    pop r4			; cX du X-Wing
+    pop r3			; cY du X-Wing
+	pop r6			; longueur des carres du cube
+	pop r5			; coords des coins bas gauche
+    push r3			; cY du X-Wing
+    push r4			; cX du X-Wing
+	leti r0 0		; Noir
+	call draw_cube		; efface le cube
 
-    pop r4
-    pop r3
-	pop r2
-	pop r1
-	pop r0			;distance du bloc en INT
-    pop r7
+    pop r4			; cX du X-wing
+    pop r3			; cY du X-wing
+	pop r2			; cx du cube
+	pop r1			; cy du cube
+	pop r0			; distance du bloc en INT
+	pop r7			; nombre de blocs deja passes
 	sub2i r0 8 ; le vaisseau avance d'une distance 8 + r7 à chaque fois
     sub2 r0 r7 ; ainsi, la vitesse augemente au fur et à mesure.
-    push r7
+    push r7    ;nombre de blocs deja passes
 	cmpi r0 -1
-	jumpif sgt intern_forloop
+	jumpif sgt intern_forloop ;le bloc n'a pas atteint le vaissal
 
-	pop r7
+
+	pop r7			; le bloc est a la hauteur du vaissal
 	add2i r7 1
     cmpi r7 30 ; on s'arrête au bout de 30 blocs
 	jumpif ge endloop
