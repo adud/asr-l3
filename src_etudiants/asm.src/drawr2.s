@@ -7,7 +7,10 @@ loop:	jump loop
 	.main
 	;; draws r2d2 at r1 r2 (topleft corner)
 	.include pictr2.s
+	.include dd.s
 
+	;; should be used after
+	;; mover2
 drawr2:	push r7
 	xor3i r2 r2 127
 	let r3 r2
@@ -18,7 +21,7 @@ drawr2:	push r7
 	shift left r3 4
 	add2i r3 0x10000
 	setctr a0 r3		;a0 pointe sur l'ecran
-	call pictr2.s$get_ptr
+	leti r6 0x63000
 	setctr a1 r6		;a1 vers le droide
 
 	leti r1 57
@@ -37,5 +40,17 @@ forloop2:
 	jumpif nz forloop1
 	pop r7
 	return
+
+mover2:
+	push r7
+	call pictr2.s$get_ptr
+	setctr a0 r6		;copy R2D2 outside
+	leti r0 0x63000		;of the screen...
+	setctr a1 r0
+	leti r0 1254
+	call dd.s$dd
+	pop r7
+	return
+
 	
 	.endmain

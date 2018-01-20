@@ -1,15 +1,16 @@
+
+	call begin_screen
+	
+loop:	jump loop
+.main	
 	.include aff.s
 	.include graphic.s
 	.include attact.s
 	.include drawr2.s
 
-	call begin_screen
-	
-loop:	jump loop
-	
 begin_screen:	
 	push r7
-	leti r1 10
+	leti r1 80
 	leti r2 92
 	call drawr2.s$drawr2
 

@@ -1,13 +1,19 @@
-	;copie l'ecran juste en-dessous
-	leti r0 0x0
+	leti r0 0x10000
 	setctr a0 r0
-	leti r0 0x0
-	setctr a1 r0
-	
-	leti r1 0x10000
-loop:	readze a0 64 r0
-	write a1 64 r0
-	sub2i r1 1
-	jumpif nz loop
+	leti r0 0x60000
+	setctr a0 r0
+	leti r0 0x2800
 
-fin:	jump fin
+loop:	jump loop 
+
+.main
+
+	;; dd copy r0*4 bytes
+	;; from a0 to a1
+dd:	readze a0 32 r1
+	write a1 32 r1
+	sub2i r0 1
+	jumpif nz dd
+	return
+
+.endmain

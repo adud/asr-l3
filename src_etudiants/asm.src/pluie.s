@@ -1,8 +1,10 @@
-	;; un petit test graphique 
-
+	;; un petit test graphique
+	call speech.s$drawr2.s$mover2
+	call graphic.s$clear_screen
+	call speech.s$begin_screen 
 	leti r7 0 ; le nombre de blocs qui ont fini de passer
-    leti r3 1 ; la ligne à laquelle est affichée le X-wing
-    leti r4 1 ; la colonne à laquelle est affichée le X-wing
+	leti r3 1 ; la ligne à laquelle est affichée le X-wing
+	leti r4 1 ; la colonne à laquelle est affichée le X-wing
 
 extern_forloop:
 
@@ -125,10 +127,9 @@ endloop:    jump endloop
 .include fxrth16.s
 .include attact.s
 .include graphic.s
-.include mult.s
 .include div.s
 .include x-wing-sprite.s
-	
+.include speech.s	
 	;; coords_square_dist
 	
 	;; if r0 contains the distance of the block
@@ -209,12 +210,12 @@ calc_coords:
 	let r4 r5
 	let r1 r6
 	pop r0			;cx
-	call mult.s$mult
+	call fxrth16.s$mult.s$mult
 	add2 r5 r2
 	shift left r5 16
 	let r1 r6
 	pop r0			;cy ;empty stack
-	call mult.s$mult
+	call fxrth16.s$mult.s$mult
 	add2 r5 r2
 	add2 r5 r4
 	pop r7
