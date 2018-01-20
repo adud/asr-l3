@@ -3,7 +3,6 @@
 	call drawr2
 	
 loop:	jump loop
-
 	
 	.main
 	;; draws r2d2 at r1 r2 (topleft corner)

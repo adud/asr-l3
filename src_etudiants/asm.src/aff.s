@@ -1,4 +1,4 @@
-    call get_text
+	call get_text
 	setctr a1 r6
 	leti r0 0x10000
 	setctr a0 r0
