@@ -6,8 +6,9 @@ loop:	jump loop
 	
 	.main
 	;; draws r2d2 at r1 r2 (topleft corner)
-	.include pictr2.s
 	.include dd.s
+	.include pictr2.s
+
 
 	;; should be used after
 	;; mover2

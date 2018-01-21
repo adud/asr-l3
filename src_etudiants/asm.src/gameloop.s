@@ -2,7 +2,7 @@
 	.include attact.s
 	.include pluie.s
 	.include speech.s
-	
+
 	call speech.s$drawr2.s$mover2
 	leti r0 0
 	call pluie.s$graphic.s$clear_screen
@@ -134,13 +134,15 @@ intern_forloop: 		;the animation of one square
 you_lose:
 	leti r0 0
 	call pluie.s$graphic.s$clear_screen
+	leti r0 1000
+	call speech.s$attact.s$pause
 	call speech.s$aff_lose_text
 yolo_loop:	
 	leti r0 0x62051
 	setctr a1 r0
 	readze a1 1 r0
 	cmpi r0 1
-	jumpif eq you_won
+	jumpif eq end_game
 	readze a1 1 r0
 	cmpi r0 1
 	jumpif eq game_begin
@@ -148,6 +150,10 @@ yolo_loop:
 you_won:
 	leti r0 0
 	call pluie.s$graphic.s$clear_screen
-	;; call speech.s$win_screen
+	leti r0 1000
+	call speech.s$attact.s$pause
+	call speech.s$win_screen
 end_game:
-	jump end_game
+	leti r0 0
+	call pluie.s$graphic.s$clear_screen
+loop:	jump loop

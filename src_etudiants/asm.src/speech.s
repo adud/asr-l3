@@ -110,7 +110,6 @@ lose_text:
 	.const "Try again ?\n\r\n\r....^^....\n\r....vv....\n\r\n\r...Quit..."
 
 get_win_text:
-	return
  	getctr pc r6
  	add2i r6 24
  	return
@@ -118,13 +117,15 @@ win_text:
  	.const "U t F L\n\rs h o u\n\re e r k\n\r. . c e\n\r. . e ."
  	.const "..?"
  	.const "L g\n\re o\n\rt"
- 	.const "Red 5, you turned off your computer, what's wrong ?"
- 	.const "Nothing, I'm all right"
+ 	.const "Red 5, you turned\n\roff your computer,\n\rwhat's wrong ?"
+ 	.const "Nothing, I'm all\n\rright"
+	.const "..."
+	.const " Congratulations !"
 win_screen:
  	push r7
  	call get_win_text
  	setctr a1 r6
- 	leti r4 4
+ 	leti r4 7
  	leti r0 0xd0
  	call write_speech
  	pop r7
