@@ -40,7 +40,7 @@ r2: all
 	./simu -g -m bitmap/grlib.mem asm.exec/demo.obj
 
 rf: all # exécute le rendu final
-	./simu -g asm.exec/pluie.obj
+	./simu -g asm.exec/gameloop.obj
 
 clean :
 	$(RM) $(OFILES) $(DFILES) $(OBJFILES) $(ASMDFILES)
