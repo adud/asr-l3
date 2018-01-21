@@ -91,3 +91,26 @@ ex : ``./simu -g -m bitmap/grlib.mem --stats asm.exec/graphic.obj | ./chart.py`
   * Création d'un jeu 3D inspiré de Star-Wars IV. Il est possible de
     l'exécuter avec `make rf`.
   * déplacer le X-Wing avec les flèches directionelles pour passer a travers les blocs
+
+## Statistiques ##
+  * Le dossier `charts` contient plusieurs graphiques montrant les
+    statistiques d'utilisation des commandes. Les fichiers `demo-attact.png`
+    et `demo-noattact.png` contiennent les statistiques pour le programe
+    `demo.s` avec et sans attente active, tandis que les fichiers
+    `rf-attact.png` et `rf-no-attact.png` contiennent les statistiques pour
+    le programme final avec et sans attente active.
+  * En effet, on remarque que l'attente active déséquilibre les
+    statistiques finales, quelques instructions qui font partie de l'une
+    des boucles principales d'attente active sont particulièrement
+    utilisées.
+  * Sans attente active, pour le programme final, les instructions les plus
+    utilisée sont `jumpif`, `shift`, `add2`, `add2i`, `readze/push` et...
+    `xor3i`. En effet, `xor3i` est particulièrement utilisée pour effectuer
+    la soustraction `x <- 127 - x` lorsqu'il s'agit d'afficher un point.
+  * Nous n'avons pas eu besoin de certaines instructions logiques telles
+    que `or2i`, `and2`, `and2i`, `or3`, `or3i`.
+  * Les accès mémoires sont principalement utilisés pour lire des
+    instuctions (~61% des lectures) ou lire l'horloge (~29% des lectures).
+    Il y a 20 fois moins d'écritures que de lectures. Pour limiter les
+    échanges entre le processeur et la mémoire, il faut donc faire du code
+    efficace pour limiter les échanges de code, et éviter l'attente active.
