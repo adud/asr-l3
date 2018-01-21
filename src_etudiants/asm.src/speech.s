@@ -21,54 +21,43 @@ begin_screen:
 	setctr a0 r1
 	call aff.s$wrtxt
 
-	call wait_for_key
+	call attact.s$wait_for_key
 	leti r0 0
 	call graphic.s$clear_screen
 
-	leti r4 15
+	
 	call get_speech
 	setctr a1 r6
-text_mainloop:
-	leti r0 0xf0
+	leti r4 15
+	leti r0 0xd0
+	call write_speech
+	pop r7
+	return
+
+	;; if a1 points on $(r4) strings
+	;; then write_speech will print
+	;; theses strings one after one
+	;; waiting a key to be pressed
+	;; between two strings
+	;; with the colour r0
+write_speech:
+	push r7
+write_speech_mainloop:
+	push r4
+	push r0
 	leti r3 0x10000
 	setctr a0 r3
 	call aff.s$wrtxt
-	call wait_for_key
+	call attact.s$wait_for_key
 	leti r0 0
 	call graphic.s$clear_screen
+	pop r0
+	pop r4
 	sub2i r4 1
-	jumpif nz text_mainloop
-
+	jumpif nz write_speech_mainloop
 	pop r7
 	return
 	
-wait_for_key:
-	push r7
-	
-wfk_loop:
-	leti r2 0
-	leti r1 0x62000
-	setctr a0 r1
-	readze a0 32 r1
-	add2 r2 r1
-	readze a0 32 r1
-	add2 r2 r1
-	readze a0 32 r1
-	add2 r2 r1
-	readze a0 32 r1
-	add2 r2 r1
-	jumpif z wfk_loop
-	leti r1 0x62000
-	leti r2 0
-	write a0 32 r0
-	write a0 32 r0
-	write a0 32 r0
-	write a0 32 r0
-	leti r0 150
-	call attact.s$pause
-
-	pop r7
-	return
 
 get_speech:
     getctr pc r6
@@ -99,4 +88,46 @@ get_starttext:
 	
 starttext:
 	.const "Press any key\n\rto start"
-.endmain
+
+aff_lose_text:
+	push r7
+	call get_lose_text
+	setctr a1 r6
+	leti r0 0xf0
+	leti r1 0x10000
+	setctr a0 r1
+	call aff.s$wrtxt
+	
+	pop r7
+	return
+	
+get_lose_text:
+	getctr pc r6
+	add2i r6 24
+	return
+
+lose_text:
+	.const "Try again ?\n\r\n\r....^^....\n\r....vv....\n\r\n\r...Quit..."
+
+get_win_text:
+	return
+ 	getctr pc r6
+ 	add2i r6 24
+ 	return
+win_text:
+ 	.const "U t F L\n\rs h o u\n\re e r k\n\r. . c e\n\r. . e ."
+ 	.const "..?"
+ 	.const "L g\n\re o\n\rt"
+ 	.const "Red 5, you turned off your computer, what's wrong ?"
+ 	.const "Nothing, I'm all right"
+win_screen:
+ 	push r7
+ 	call get_win_text
+ 	setctr a1 r6
+ 	leti r4 4
+ 	leti r0 0xd0
+ 	call write_speech
+ 	pop r7
+ 	return
+	
+ .endmain

@@ -4,8 +4,13 @@
 	.include speech.s
 	
 	call speech.s$drawr2.s$mover2
+	leti r0 0
 	call pluie.s$graphic.s$clear_screen
-	call speech.s$begin_screen 
+	call speech.s$begin_screen
+
+game_begin:
+	leti r0 0
+	call pluie.s$graphic.s$clear_screen
 	leti r7 0 ; le nombre de blocs qui ont fini de passer
 	leti r3 1 ; la ligne à laquelle est affichée le X-wing
 	leti r4 1 ; la colonne à laquelle est affichée le X-wing
@@ -48,7 +53,7 @@ intern_forloop: 		;the animation of one square
 	push r4			; cX du Y-Wing
 	push r0			; distance du bloc en fix
 	
-	leti r0 0b11100000	; vert pale
+	leti r0 0xd0		; vert pale
 	call pluie.s$draw_cube		
 
     ; on affiche le décor
@@ -115,13 +120,34 @@ intern_forloop: 		;the animation of one square
 	pop r7			; le bloc est a la hauteur du vaissal
 	add2i r7 1
     cmpi r7 30 ; on s'arrête au bout de 30 blocs
-	jumpif ge endloop
+	jumpif ge you_won
     ; si (r1, r2) != (r3, r4), on rentre en collision avec le bloc et c'est
     ; la fin du jeu.
     cmp r1 r3
-    jumpif neq endloop
+    jumpif neq you_lose
     cmp r2 r4
-    jumpif neq endloop
+    jumpif neq you_lose
     jump extern_forloop
     
-endloop:    jump endloop
+	;; si on a perdu
+
+you_lose:
+	leti r0 0
+	call pluie.s$graphic.s$clear_screen
+	call speech.s$aff_lose_text
+yolo_loop:	
+	leti r0 0x62051
+	setctr a1 r0
+	readze a1 1 r0
+	cmpi r0 1
+	jumpif eq you_won
+	readze a1 1 r0
+	cmpi r0 1
+	jumpif eq game_begin
+	jump yolo_loop
+you_won:
+	leti r0 0
+	call pluie.s$graphic.s$clear_screen
+	;; call speech.s$win_screen
+end_game:
+	jump end_game
