@@ -19,4 +19,5 @@ y_pos = arange(len(barres[1]))
 plt.barh(y_pos, barres[1][::-1])
 plt.yticks(y_pos,barres[0][::-1])
 
-plt.show()
+plt.savefig('no-attact.png')
+#plt.show()

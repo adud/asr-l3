@@ -86,3 +86,7 @@ ex : ``./simu -g -m bitmap/grlib.mem --stats asm.exec/graphic.obj | ./chart.py`
 ## L'assembleur ##
   * Renommage des directive `#include`, `#main` et `#endmain` en `.include`,
     `.main` et `.endmain`.
+
+## Programme ##
+  * Création d'un jeu 3D inspiré de Star-Wars IV. Il est possible de
+    l'exécuter avec `make rf`.
