@@ -47,6 +47,11 @@ uint64_t rule30(const uint64_t q)
 	return p^(q|r);
 }
 
+uint64_t randgen(const uint64_t q)
+{
+	return (q*43%((1<<19) - 1))+1;
+}
+
 int main(int argc, char* argv[]) {
 	std::cerr << "emulator for ==" << WORDSIZE << "== architecture\n";  
 	if(argc==1) {
@@ -135,7 +140,7 @@ int main(int argc, char* argv[]) {
 			m->write_bit_raw(MEM_CLOCK_BEGIN+63-i,1&time_ms>>i);
 		}
 
-		m->m[MEM_RGEN_BEGIN/64]=rule30(m->m[MEM_RGEN_BEGIN/64]);
+		m->m[MEM_RGEN_BEGIN/64]=randgen(m->m[MEM_RGEN_BEGIN/64]);
 		
 		lastopc = p->von_Neuman_step(debug&&ppl);
 		if(lastopc==-1)
