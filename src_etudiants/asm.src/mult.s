@@ -13,13 +13,21 @@ loop:	jump loop
 mult:	push r0
 	push r1
 	leti r2 0
-wb:	shift right r0 1	;inv:r0*r1+r2
+	push r7
+	call multsum
+	pop r7
+	pop r1
+	pop r0
+	return
+
+multsum:
+	shift right r0 1	;inv:r0*r1+r2
 	jumpif nc sk		;nb bits lus<=69
 	add2 r2 r1
 sk:	shift left r1 1
 	cmpi r0 0
-	jumpif nz wb
-	pop r1
-	pop r0
+	jumpif nz multsum
 	return
+
+
 .endmain
