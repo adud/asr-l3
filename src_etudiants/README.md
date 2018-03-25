@@ -83,6 +83,8 @@ ex : ``./simu -g -m bitmap/grlib.mem --stats asm.exec/graphic.obj | ./chart.py`
 
 # Rendu Final #
 
+Attention : presque tous les programmes ont été écrits pour 32 bits. Tout fonctionnement en 64 serait purement fortuit. Seul `matmul.s` nécessite 64 bits.
+
 ## L'assembleur ##
   * Renommage des directive `#include`, `#main` et `#endmain` en `.include`,
     `.main` et `.endmain`.

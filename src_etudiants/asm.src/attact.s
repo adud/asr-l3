@@ -1,6 +1,7 @@
 	;; attente active (c'est le mal (aka Fenêtre))
 	;; fait une pause de n ms, r0=n
-pause:	push r1
+pause:	
+	push r1
 	push r2
 	push r3
 	push r4			;sauvegarde a1
