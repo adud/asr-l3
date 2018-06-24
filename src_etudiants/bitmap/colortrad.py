@@ -26,4 +26,4 @@ def ppmtrad(filename):
     return sortie
 
 if __name__ == "__main__":
-    print(ppmtrad(argv[1]))
+    print(colortrad(int(argv[1]),int(argv[2]),int(argv[3])))

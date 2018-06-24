@@ -53,16 +53,16 @@ intern_forloop: 		;the animation of one square
 	push r4			; cX du Y-Wing
 	push r0			; distance du bloc en fix
 	
-	leti r0 0xd0		; vert pale
+	leti r0 0x3e0		; vert pale
 	call pluie.s$draw_cube		
 
     ; on affiche le décor
-	leti r0 0b11100000	; vert pale
+	leti r0 0x3e0	; vert flashy (pale difficile a voir)
 	call pluie.s$draw_background
 
     ; on affiche le bloc
 	pop r0			; distance du bloc en fix
-	leti r1 0b11100000	; vert pale
+	leti r1 0x3e0	; vert flash
 	call pluie.s$hvlines
 
     ; on affiche le X-wing

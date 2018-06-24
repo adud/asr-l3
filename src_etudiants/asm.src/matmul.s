@@ -11,7 +11,7 @@
 	leti r5 4
 	leti r6 0x10000	;on trouvera la multiplication ici
 	call multmatrix
-
+	jump end
 	
 	leti r0 3
 	leti r1 2

@@ -16,7 +16,7 @@ begin_screen:
 
 	call get_starttext
 	setctr a1 r6
-	leti r0 0xf0
+	leti r0 0xffff
 	leti r1 0x10000
 	setctr a0 r1
 	call aff.s$wrtxt
@@ -29,7 +29,7 @@ begin_screen:
 	call get_speech
 	setctr a1 r6
 	leti r4 15
-	leti r0 0xd0
+	leti r0 0xffff
 	call write_speech
 	pop r7
 	return
@@ -93,7 +93,7 @@ aff_lose_text:
 	push r7
 	call get_lose_text
 	setctr a1 r6
-	leti r0 0xf0
+	leti r0 0x3e0
 	leti r1 0x10000
 	setctr a0 r1
 	call aff.s$wrtxt
@@ -126,7 +126,7 @@ win_screen:
  	call get_win_text
  	setctr a1 r6
  	leti r4 7
- 	leti r0 0xd0
+ 	leti r0 0x3e0
  	call write_speech
  	pop r7
  	return
